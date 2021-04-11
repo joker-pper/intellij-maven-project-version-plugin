@@ -1,0 +1,68 @@
+<idea-plugin>
+    <id>com.github.jokerpper.intellij-maven-project-version-plugin</id>
+    <name>intellij-maven-project-version</name>
+    <vendor>joker-pper</vendor>
+
+    <description><![CDATA[
+    Maven Project Version Plugin.
+    <br/>
+    <br/>
+    <em>Plugin Menu Added In Tools Menu.</em>
+    <br/>
+    <br/>
+    <em>1.More Strategy To Update Version.</em>
+    <br/>
+    <br/>
+    <ul>
+        <li> <em>Support Must Same Version To Update.</em> </li>
+        <br/>
+        <li> <em>Default Strategy Support Dependency Version Is Special Value (e.g: ${version} / [1.6, 1.8]) Will Continue.</em> </li>
+    </ul>
+    <br/>
+    <em>2.Active Show Version In Project View.</em>
+    <br/>
+    ]]></description>
+
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>org.jetbrains.idea.maven</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <postStartupActivity implementation="com.github.jokerpper.mavenprojectversion.startup.MavenProjectVersionStartupActivity" />
+
+        <projectViewNodeDecorator implementation="com.github.jokerpper.mavenprojectversion.decorator.MavenProjectVersionViewDecorator"/>
+    </extensions>
+
+
+    <project-components>
+        <component>
+            <implementation-class>com.github.jokerpper.mavenprojectversion.state.ShowMavenProjectVersionState</implementation-class>
+        </component>
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+        <action id="MavenProjectVersion.Update" class="com.github.jokerpper.mavenprojectversion.action.UpdateMavenProjectVersionAction" text="Maven Project Version Update"
+                description="maven project version update">
+            <add-to-group group-id="Maven.ShowSettingsGroup" anchor="after" relative-to-action="Maven.ShowSettings" />
+<!--
+            <add-to-group group-id="ToolsMenu" anchor="after" relative-to-action="CreateLauncherScript" />
+-->
+            <add-to-group group-id="ToolsMenu" anchor="last"  />
+        </action>
+
+        <action id="MavenProjectVersion.Show" class="com.github.jokerpper.mavenprojectversion.action.ShowMavenProjectVersionAction" text="Maven Project Version Show"
+                description="maven project version show">
+
+            <add-to-group group-id="Maven.ShowSettingsGroup" anchor="after" relative-to-action="MavenProjectVersion.Update" />
+
+            <add-to-group group-id="ToolsMenu" anchor="last" />
+        </action>
+
+    </actions>
+
+</idea-plugin>
