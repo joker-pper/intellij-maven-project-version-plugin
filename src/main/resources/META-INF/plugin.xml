@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>com.github.jokerpper.intellij-maven-project-version-plugin</id>
-    <name>intellij-maven-project-version</name>
+    <name>Maven Project Version</name>
     <vendor>joker-pper</vendor>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
