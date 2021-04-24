@@ -45,11 +45,7 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
     private MavenProject rootProject;
     private UpdateMavenProjectVersionStrategyEnum updateMavenProjectVersionStrategyEnum;
 
-    private String oldVersion;
-
     private String newVersion;
-
-    private boolean isMustSameVersion;
 
     private Exception updateVersionException;
 
@@ -81,8 +77,6 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
         this.rootProject = updateMavenProjectVersionForm.getRootProject();
         this.updateMavenProjectVersionStrategyEnum = updateMavenProjectVersionForm.getUpdateMavenProjectVersionStrategy();
         this.newVersion = updateMavenProjectVersionForm.getNewVersion();
-        this.oldVersion = updateMavenProjectVersionForm.getOldVersion();
-        this.isMustSameVersion = updateMavenProjectVersionForm.isMustSameVersion();
         this.updateVersionException = null;
 
         if (updateMavenProjectVersionStrategyEnum.checkVersion(project, updateMavenProjectVersionForm)) {

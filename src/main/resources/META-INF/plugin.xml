@@ -49,21 +49,20 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action id="MavenProjectVersion.Update" class="com.github.jokerpper.mavenprojectversion.action.UpdateMavenProjectVersionAction" text="Maven Project Version Update"
+
+        <group id="MavenProjectVersion.ToolsMenu.ActionGroup" class="com.github.jokerpper.mavenprojectversion.support.MavenProjectVersionActionGroup" popup="true" text="Maven Project Version">
+            <add-to-group group-id="ToolsMenu" anchor="last" />
+        </group>
+
+        <action id="MavenProjectVersion.ToolsMenu.Update" class="com.github.jokerpper.mavenprojectversion.action.UpdateMavenProjectVersionAction" text="Project Version Update"
                 description="maven project version update">
-            <add-to-group group-id="Maven.ShowSettingsGroup" anchor="after" relative-to-action="Maven.ShowSettings" />
-<!--
-            <add-to-group group-id="ToolsMenu" anchor="after" relative-to-action="CreateLauncherScript" />
--->
-            <add-to-group group-id="ToolsMenu" anchor="last"  />
+            <add-to-group group-id="MavenProjectVersion.ToolsMenu.ActionGroup" />
         </action>
 
-        <action id="MavenProjectVersion.Show" class="com.github.jokerpper.mavenprojectversion.action.ShowMavenProjectVersionAction" text="Maven Project Version Show"
+        <action id="MavenProjectVersion.ToolsMenu.Show" class="com.github.jokerpper.mavenprojectversion.action.ShowMavenProjectVersionAction" text="Project Version Show"
                 description="maven project version show">
-
-            <add-to-group group-id="Maven.ShowSettingsGroup" anchor="after" relative-to-action="MavenProjectVersion.Update" />
-
-            <add-to-group group-id="ToolsMenu" anchor="last" />
+            <add-to-group group-id="MavenProjectVersion.ToolsMenu.ActionGroup"  anchor="after"
+                          relative-to-action="MavenProjectVersion.ToolsMenu.Update" />
         </action>
 
     </actions>
