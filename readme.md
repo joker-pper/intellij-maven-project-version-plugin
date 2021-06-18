@@ -15,7 +15,7 @@
 
 ## install
 
- - intellij-maven-project-version-plugin-1.0.0.jar -> [src/test/resources/libs/intellij-maven-project-version-plugin-1.0.0-SNAPSHOT.jar](src/test/resources/libs/intellij-maven-project-version-plugin-1.0.0.jar)
+ - intellij-maven-project-version-plugin-1.0.0.jar -> [src/test/resources/libs/intellij-maven-project-version-plugin-1.0.0.jar](src/test/resources/libs/intellij-maven-project-version-plugin-1.0.0.jar)
 
 
 ## other
