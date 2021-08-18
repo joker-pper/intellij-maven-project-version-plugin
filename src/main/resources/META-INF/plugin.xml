@@ -20,9 +20,9 @@
     <p style="margin-left: 15px; margin-top: 5px">- must have new version.</p>
     <p style="margin-left: 15px; margin-top: 5px">- when version exist and matched will replace.</p>
 
-    <p style="margin-left: 10px; font-size:11px; margin-top: 2px">Support Must Same Version</p>
-    <p style="margin-left: 15px; margin-top: 5px">- if not checked: version will to replace.</p>
-    <p style="margin-left: 15px; margin-top: 5px">- if checked: version not equals will continue replace.</p>
+    <p style="margin-left: 10px; font-size:11px; margin-top: 2px">Support Must Same Version (Before)</p>
+    <p style="margin-left: 15px; margin-top: 5px">- if checked: project or dependency version not equals project before replacement version will continue replace.</p>
+    <p style="margin-left: 15px; margin-top: 5px">- if not checked: new version will to replace.</p>
 
     <h4>2.Active Show Version In Project View.</h4>
 

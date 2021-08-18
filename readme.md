@@ -19,10 +19,11 @@
         - must have new version.
         - when version exist and matched will replace.
      
-    - Support Must Same Version
+    - Support Must Same Version (Before) 
      
-        - if not checked: version will to replace. 
-        - if checked: version not equals will continue replace.
+        - if checked: project or dependency version not equals project before replacement version will continue replace.
+        - if not checked: new version will to replace.
+
      
 
 + Maven Project Version Show
