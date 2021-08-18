@@ -79,7 +79,8 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
         this.newVersion = updateMavenProjectVersionForm.getNewVersion();
         this.updateVersionException = null;
 
-        if (updateMavenProjectVersionStrategyEnum.checkVersion(project, updateMavenProjectVersionForm)) {
+        if (updateMavenProjectVersionStrategyEnum.checkVersionPass(project, updateMavenProjectVersionForm)) {
+            //检查版本通过后执行更新版本操作
             WriteCommandAction.runWriteCommandAction(project, this::updateVersion);
         }
 
@@ -106,6 +107,7 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
             }
 
             for (MavenProject mavenProject : projects) {
+                //获取是否为匹配的project
                 boolean isMatchProject = MatchUtils.isMatchProject(rootProjectGroupId, projectAllArtifactIdList, mavenProject.getMavenId());
                 if (!isMatchProject) {
                     continue;
@@ -120,23 +122,25 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
 
                 MavenDomProjectModel rootElement = domFileElement.getRootElement();
 
-                //resolve project version
+                //resolve current project version
                 GenericDomValue<String> version = rootElement.getVersion();
                 if (version.exists() && updateMavenProjectVersionStrategyEnum.isUpdateProjectVersion(project, updateMavenProjectVersionForm, version.getRawText())) {
+                    //版本存在且通过更新版本条件时进行更新
                     version.setValue(newVersion);
                 }
 
-                //resolve parent project version
+                //resolve current project parent project version
                 MavenDomParent mavenDomParent = rootElement.getMavenParent();
                 if (mavenDomParent.exists() && MatchUtils.isMatchProjectParent(rootProjectGroupId, projectAllArtifactIdList, mavenDomParent)) {
                     //parent match to set value
                     GenericDomValue<String> parentVersion = mavenDomParent.getVersion();
                     if (parentVersion.exists() && updateMavenProjectVersionStrategyEnum.isUpdateProjectParentVersion(project, updateMavenProjectVersionForm, parentVersion.getRawText())) {
+                        //版本存在且通过更新版本条件时进行更新
                         parentVersion.setValue(newVersion);
                     }
                 }
 
-                //resolve dependencies
+                //resolve current project dependencies
                 MavenDomDependencies mavenDomDependencies = rootElement.getDependencies();
                 if (mavenDomDependencies.exists()) {
                     List<MavenDomDependency> dependencies = mavenDomDependencies.getDependencies();
@@ -144,14 +148,14 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
                         if (MatchUtils.isMatchMavenDomDependency(rootProjectGroupId, projectAllArtifactIdList, domDependency)) {
                             //match dependency
                             GenericDomValue<String> domDependencyVersion = domDependency.getVersion();
-                            if (domDependencyVersion.exists() && updateMavenProjectVersionStrategyEnum.isUpdateProjectDependency(project, updateMavenProjectVersionForm, domDependencyVersion.getRawText())) {
+                            if (domDependencyVersion.exists() && updateMavenProjectVersionStrategyEnum.isUpdateProjectDependencyVersion(project, updateMavenProjectVersionForm, domDependencyVersion.getRawText())) {
                                 domDependencyVersion.setValue(newVersion);
                             }
                         }
                     }
                 }
 
-                //resolve dependencyManagement dependencies
+                //resolve current project dependencyManagement dependencies
                 MavenDomDependencies mavenDependencyManagementDomDependencies = rootElement.getDependencyManagement().getDependencies();
                 if (mavenDependencyManagementDomDependencies.exists()) {
                     List<MavenDomDependency> dependencies = mavenDependencyManagementDomDependencies.getDependencies();
@@ -159,7 +163,7 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
                         if (MatchUtils.isMatchMavenDomDependency(rootProjectGroupId, projectAllArtifactIdList, domDependency)) {
                             //match dependency
                             GenericDomValue<String> domDependencyVersion = domDependency.getVersion();
-                            if (domDependencyVersion.exists() && updateMavenProjectVersionStrategyEnum.isUpdateProjectDependencyManagementDependency(project, updateMavenProjectVersionForm, domDependencyVersion.getRawText())) {
+                            if (domDependencyVersion.exists() && updateMavenProjectVersionStrategyEnum.isUpdateProjectDependencyManagementDependencyVersion(project, updateMavenProjectVersionForm, domDependencyVersion.getRawText())) {
                                 domDependencyVersion.setValue(newVersion);
                             }
                         }

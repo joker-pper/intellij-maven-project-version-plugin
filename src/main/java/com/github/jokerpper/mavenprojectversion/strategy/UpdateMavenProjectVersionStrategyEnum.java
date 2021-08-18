@@ -9,27 +9,29 @@ public enum UpdateMavenProjectVersionStrategyEnum implements UpdateMavenProjectV
 
     DEFAULT {
         @Override
-        public boolean checkVersion(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm) {
+        public boolean checkVersionPass(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm) {
             if (updateMavenProjectVersionForm.getNewVersion() == null) {
                 Messages.showWarningDialog(project, "New Version Must Be Not Empty", "Warning");
                 return false;
             }
 
             if (VersionUtils.isEquals(updateMavenProjectVersionForm.getOldVersion(), updateMavenProjectVersionForm.getNewVersion())) {
+                //新版本必须与之前不一致
                 Messages.showMessageDialog(project, "Not Changed Version", "Warning", Messages.getWarningIcon());
                 return false;
             }
             return true;
-
         }
 
         @Override
         public boolean isUpdateProjectVersion(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String beforeVersion) {
             if (beforeVersion == null) {
+                //不存在版本时
                 return false;
             }
 
             if (!updateMavenProjectVersionForm.isMustSameVersion() || VersionUtils.isEquals(updateMavenProjectVersionForm.getOldVersion(), beforeVersion)) {
+                //不检查版本相等或当前的版本与之前版本一致时
                 return true;
             }
 
@@ -39,10 +41,12 @@ public enum UpdateMavenProjectVersionStrategyEnum implements UpdateMavenProjectV
         @Override
         public boolean isUpdateProjectParentVersion(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String parentBeforeVersion) {
             if (parentBeforeVersion == null) {
+                //不存在版本时
                 return false;
             }
 
             if (!updateMavenProjectVersionForm.isMustSameVersion() || VersionUtils.isEquals(updateMavenProjectVersionForm.getOldVersion(), parentBeforeVersion)) {
+                //不检查版本相等或当前的版本与之前版本一致时
                 return true;
             }
 
@@ -50,8 +54,9 @@ public enum UpdateMavenProjectVersionStrategyEnum implements UpdateMavenProjectV
         }
 
         @Override
-        public boolean isUpdateProjectDependency(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String beforeVersion) {
+        public boolean isUpdateProjectDependencyVersion(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String beforeVersion) {
             if (beforeVersion == null) {
+                //不存在版本时
                 return false;
             }
 
@@ -61,6 +66,7 @@ public enum UpdateMavenProjectVersionStrategyEnum implements UpdateMavenProjectV
             }
 
             if (!updateMavenProjectVersionForm.isMustSameVersion() || VersionUtils.isEquals(updateMavenProjectVersionForm.getOldVersion(), beforeVersion)) {
+                //不检查版本相等或当前的版本与之前版本一致时
                 return true;
             }
 
@@ -68,16 +74,15 @@ public enum UpdateMavenProjectVersionStrategyEnum implements UpdateMavenProjectV
         }
 
         @Override
-        public boolean isUpdateProjectDependencyManagementDependency(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String beforeVersion) {
-            return isUpdateProjectDependency(project, updateMavenProjectVersionForm, beforeVersion);
+        public boolean isUpdateProjectDependencyManagementDependencyVersion(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String beforeVersion) {
+            return isUpdateProjectDependencyVersion(project, updateMavenProjectVersionForm, beforeVersion);
         }
 
     },
 
-    PROJECT_DEPENDENCIES {
-
+    GENERAL {
         @Override
-        public boolean checkVersion(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm) {
+        public boolean checkVersionPass(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm) {
             if (updateMavenProjectVersionForm.getNewVersion() == null) {
                 Messages.showWarningDialog(project, "New Version Must Be Not Empty", "Warning");
                 return false;
@@ -87,21 +92,13 @@ public enum UpdateMavenProjectVersionStrategyEnum implements UpdateMavenProjectV
 
         @Override
         public boolean isUpdateProjectVersion(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String beforeVersion) {
-            return false;
-        }
-
-        @Override
-        public boolean isUpdateProjectParentVersion(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String parentBeforeVersion) {
-            return false;
-        }
-
-        @Override
-        public boolean isUpdateProjectDependency(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String beforeVersion) {
             if (beforeVersion == null) {
+                //不存在版本时
                 return false;
             }
 
             if (!updateMavenProjectVersionForm.isMustSameVersion() || VersionUtils.isEquals(updateMavenProjectVersionForm.getOldVersion(), beforeVersion)) {
+                //不检查版本相等或当前的版本与之前版本一致时
                 return true;
             }
 
@@ -109,8 +106,38 @@ public enum UpdateMavenProjectVersionStrategyEnum implements UpdateMavenProjectV
         }
 
         @Override
-        public boolean isUpdateProjectDependencyManagementDependency(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String beforeVersion) {
-            return isUpdateProjectDependency(project, updateMavenProjectVersionForm, beforeVersion);
+        public boolean isUpdateProjectParentVersion(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String parentBeforeVersion) {
+            if (parentBeforeVersion == null) {
+                //不存在版本时
+                return false;
+            }
+
+            if (!updateMavenProjectVersionForm.isMustSameVersion() || VersionUtils.isEquals(updateMavenProjectVersionForm.getOldVersion(), parentBeforeVersion)) {
+                //不检查版本相等或当前的版本与之前版本一致时
+                return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        public boolean isUpdateProjectDependencyVersion(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String beforeVersion) {
+            if (beforeVersion == null) {
+                //不存在版本时
+                return false;
+            }
+
+            if (!updateMavenProjectVersionForm.isMustSameVersion() || VersionUtils.isEquals(updateMavenProjectVersionForm.getOldVersion(), beforeVersion)) {
+                //不检查版本相等或当前的版本与之前版本一致时
+                return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        public boolean isUpdateProjectDependencyManagementDependencyVersion(final Project project, final UpdateMavenProjectVersionForm updateMavenProjectVersionForm, final String beforeVersion) {
+            return isUpdateProjectDependencyVersion(project, updateMavenProjectVersionForm, beforeVersion);
         }
 
     }

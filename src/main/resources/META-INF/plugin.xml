@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>com.github.jokerpper.intellij-maven-project-version-plugin</id>
-    <name>Maven Project Version</name>
+    <name>MPVP(Maven)</name>
     <vendor>joker-pper</vendor>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
@@ -13,16 +13,11 @@
     <em>Plugin Menu Added In Tools Menu.</em>
     <br/>
     <br/>
-    <em>1.More Strategy To Update Version.</em>
+    1.More Strategy To Update Version.
     <br/>
     <br/>
-    <ul>
-        <li> <em>Support Must Same Version To Update.</em> </li>
-        <br/>
-        <li> <em>Default Strategy Support Dependency Version Is Special Value (e.g: ${version} / [1.6, 1.8]) Will Continue.</em> </li>
-    </ul>
+    2.Active Show Version In Project View.
     <br/>
-    <em>2.Active Show Version In Project View.</em>
     <br/>
     ]]></description>
 

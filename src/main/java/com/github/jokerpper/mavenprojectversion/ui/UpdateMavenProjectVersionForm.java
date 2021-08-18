@@ -92,7 +92,7 @@ public class UpdateMavenProjectVersionForm implements Disposable {
         strategyRadioDialogPanel.setLayout(new GridLayoutManager(1, 2, JBUI.insets(0), -1, -1));
 
         JRadioButton strategyRadioButton1 = new JRadioButton(Constants.STRATEGY_DEFAULT_TEXT, true);
-        JRadioButton strategyRadioButton2 = new JRadioButton(Constants.STRATEGY_PROJECT_DEPENDENCIES_TEXT);
+        JRadioButton strategyRadioButton2 = new JRadioButton(Constants.STRATEGY_GENERAL_TEXT);
 
         strategyRadioBtnGroup.add(strategyRadioButton1);
         strategyRadioBtnGroup.add(strategyRadioButton2);
@@ -172,7 +172,7 @@ public class UpdateMavenProjectVersionForm implements Disposable {
     }
 
     public UpdateMavenProjectVersionStrategyEnum getUpdateMavenProjectVersionStrategy() {
-        List<UpdateMavenProjectVersionStrategyEnum> strategyEnumList = Arrays.asList(UpdateMavenProjectVersionStrategyEnum.DEFAULT, UpdateMavenProjectVersionStrategyEnum.PROJECT_DEPENDENCIES);
+        List<UpdateMavenProjectVersionStrategyEnum> strategyEnumList = Arrays.asList(UpdateMavenProjectVersionStrategyEnum.DEFAULT, UpdateMavenProjectVersionStrategyEnum.GENERAL);
         int index = 0;
         Enumeration<AbstractButton> buttonEnumeration = strategyRadioBtnGroup.getElements();
         while (buttonEnumeration.hasMoreElements()) {
@@ -197,7 +197,7 @@ public class UpdateMavenProjectVersionForm implements Disposable {
 
         static final String STRATEGY_DEFAULT_TEXT = "Default";
 
-        static final String STRATEGY_PROJECT_DEPENDENCIES_TEXT = "Only This Project Dependencies";
+        static final String STRATEGY_GENERAL_TEXT = "General";
 
         static final String MAVEN_PROJECT_TEXT = "Maven Project:";
 
