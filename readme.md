@@ -26,12 +26,16 @@
      
 
 + Maven Project Version Show
+    
+    ![show-version](src/test/resources/picture/show-version.png) 
+    
+    - project view
+   
+    ![show-version-project-view](src/test/resources/picture/show-version-project-view.png) 
 
-![show-version](src/test/resources/picture/show-version.png) 
+    - structure view
 
-![show-version-project-view](src/test/resources/picture/show-version-project-view.jpg) 
-
-![show-version-structure-view](src/test/resources/picture/show-version-structure-view.jpg) 
+    ![show-version-structure-view](src/test/resources/picture/show-version-structure-view.png) 
           
 
 

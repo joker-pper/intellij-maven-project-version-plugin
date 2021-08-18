@@ -7,18 +7,25 @@
     <idea-version since-build="181"/>
 
     <description><![CDATA[
-    Maven Project Version Plugin.
+    Maven Project Version Plugin And Plugin Menu Added In Tools Menu.
     <br/>
-    <br/>
-    <em>Plugin Menu Added In Tools Menu.</em>
-    <br/>
-    <br/>
-    1.More Strategy To Update Version.
-    <br/>
-    <br/>
-    2.Active Show Version In Project View.
-    <br/>
-    <br/>
+
+    <h4>1.More Strategy To Update Version.</h4>
+
+    <p style="margin-left: 10px; font-size:11px; margin-top: 2px">Default Strategy</p>
+    <p style="margin-left: 15px; margin-top: 5px">- must have new version and changed version.</p>
+    <p style="margin-left: 15px; margin-top: 5px">- when version exist and matched will replace and support dependency version is special value (e.g: ${version} / [1.6, 1.8]) will continue replace.</p>
+
+    <p style="margin-left: 10px; font-size:11px; margin-top: 2px">General Strategy</p>
+    <p style="margin-left: 15px; margin-top: 5px">- must have new version.</p>
+    <p style="margin-left: 15px; margin-top: 5px">- when version exist and matched will replace.</p>
+
+    <p style="margin-left: 10px; font-size:11px; margin-top: 2px">Support Must Same Version</p>
+    <p style="margin-left: 15px; margin-top: 5px">- if not checked: version will to replace.</p>
+    <p style="margin-left: 15px; margin-top: 5px">- if checked: version not equals will continue replace.</p>
+
+    <h4>2.Active Show Version In Project View.</h4>
+
     ]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -30,34 +37,43 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <postStartupActivity implementation="com.github.jokerpper.mavenprojectversion.startup.MavenProjectVersionStartupActivity" />
+        <postStartupActivity
+                implementation="com.github.jokerpper.mavenprojectversion.startup.MavenProjectVersionStartupActivity"/>
 
-        <projectViewNodeDecorator implementation="com.github.jokerpper.mavenprojectversion.decorator.MavenProjectVersionViewDecorator"/>
+        <projectViewNodeDecorator
+                implementation="com.github.jokerpper.mavenprojectversion.decorator.MavenProjectVersionViewDecorator"/>
     </extensions>
 
 
     <project-components>
         <component>
-            <implementation-class>com.github.jokerpper.mavenprojectversion.state.ShowMavenProjectVersionState</implementation-class>
+            <implementation-class>com.github.jokerpper.mavenprojectversion.state.ShowMavenProjectVersionState
+            </implementation-class>
         </component>
     </project-components>
 
     <actions>
         <!-- Add your actions here -->
 
-        <group id="MavenProjectVersion.ToolsMenu.ActionGroup" class="com.github.jokerpper.mavenprojectversion.support.MavenProjectVersionActionGroup" popup="true" text="Maven Project Version">
-            <add-to-group group-id="ToolsMenu" anchor="last" />
+        <group id="MavenProjectVersion.ToolsMenu.ActionGroup"
+               class="com.github.jokerpper.mavenprojectversion.support.MavenProjectVersionActionGroup" popup="true"
+               text="Maven Project Version">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
 
-        <action id="MavenProjectVersion.ToolsMenu.Update" class="com.github.jokerpper.mavenprojectversion.action.UpdateMavenProjectVersionAction" text="Project Version Update"
+        <action id="MavenProjectVersion.ToolsMenu.Update"
+                class="com.github.jokerpper.mavenprojectversion.action.UpdateMavenProjectVersionAction"
+                text="Project Version Update"
                 description="maven project version update">
-            <add-to-group group-id="MavenProjectVersion.ToolsMenu.ActionGroup" />
+            <add-to-group group-id="MavenProjectVersion.ToolsMenu.ActionGroup"/>
         </action>
 
-        <action id="MavenProjectVersion.ToolsMenu.Show" class="com.github.jokerpper.mavenprojectversion.action.ShowMavenProjectVersionAction" text="Project Version Show"
+        <action id="MavenProjectVersion.ToolsMenu.Show"
+                class="com.github.jokerpper.mavenprojectversion.action.ShowMavenProjectVersionAction"
+                text="Project Version Show"
                 description="maven project version show">
-            <add-to-group group-id="MavenProjectVersion.ToolsMenu.ActionGroup"  anchor="after"
-                          relative-to-action="MavenProjectVersion.ToolsMenu.Update" />
+            <add-to-group group-id="MavenProjectVersion.ToolsMenu.ActionGroup" anchor="after"
+                          relative-to-action="MavenProjectVersion.ToolsMenu.Update"/>
         </action>
 
     </actions>
