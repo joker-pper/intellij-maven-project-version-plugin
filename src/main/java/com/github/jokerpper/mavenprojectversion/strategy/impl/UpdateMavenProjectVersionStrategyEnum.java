@@ -1,5 +1,6 @@
-package com.github.jokerpper.mavenprojectversion.strategy;
+package com.github.jokerpper.mavenprojectversion.strategy.impl;
 
+import com.github.jokerpper.mavenprojectversion.strategy.UpdateMavenProjectVersionStrategy;
 import com.github.jokerpper.mavenprojectversion.ui.UpdateMavenProjectVersionForm;
 import com.github.jokerpper.mavenprojectversion.util.VersionUtils;
 import com.intellij.openapi.project.Project;

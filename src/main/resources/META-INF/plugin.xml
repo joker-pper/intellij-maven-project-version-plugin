@@ -47,8 +47,7 @@
 
     <project-components>
         <component>
-            <implementation-class>com.github.jokerpper.mavenprojectversion.state.ShowMavenProjectVersionState
-            </implementation-class>
+            <implementation-class>com.github.jokerpper.mavenprojectversion.state.ShowMavenProjectVersionState</implementation-class>
         </component>
     </project-components>
 

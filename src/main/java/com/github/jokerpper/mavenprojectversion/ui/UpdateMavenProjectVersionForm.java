@@ -1,6 +1,6 @@
 package com.github.jokerpper.mavenprojectversion.ui;
 
-import com.github.jokerpper.mavenprojectversion.strategy.UpdateMavenProjectVersionStrategyEnum;
+import com.github.jokerpper.mavenprojectversion.strategy.impl.UpdateMavenProjectVersionStrategyEnum;
 import com.github.jokerpper.mavenprojectversion.util.StringUtils;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.ui.ComboBox;
