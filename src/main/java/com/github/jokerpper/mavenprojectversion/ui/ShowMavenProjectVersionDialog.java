@@ -1,19 +1,18 @@
 package com.github.jokerpper.mavenprojectversion.ui;
 
-import com.github.jokerpper.mavenprojectversion.constants.Constants;
+import com.github.jokerpper.mavenprojectversion.constants.SystemConstants;
 import com.github.jokerpper.mavenprojectversion.handler.ShowMavenProjectVersionHandler;
 import com.github.jokerpper.mavenprojectversion.state.ShowMavenProjectVersionState;
+import com.github.jokerpper.mavenprojectversion.support.LanguageUtils;
+import com.github.jokerpper.mavenprojectversion.support.MessagesUtils;
 import com.github.jokerpper.mavenprojectversion.util.StringUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
 public class ShowMavenProjectVersionDialog extends DialogWrapper {
-
-    private static final String title = "Show Maven Project Version";
 
     private final Project project;
 
@@ -26,7 +25,10 @@ public class ShowMavenProjectVersionDialog extends DialogWrapper {
 
         this.showMavenProjectVersionForm = new ShowMavenProjectVersionForm(project);
 
+        String title = LanguageUtils.get(LanguageUtils.Constants.SHOW_MAVEN_PROJECT_VERSION_TITLE);
         setTitle(title);
+        setOKButtonText(LanguageUtils.get(LanguageUtils.Constants.OK_BUTTON_TEXT));
+        setCancelButtonText(LanguageUtils.get(LanguageUtils.Constants.CANCEL_BUTTON_TEXT));
         init();
     }
 
@@ -40,7 +42,8 @@ public class ShowMavenProjectVersionDialog extends DialogWrapper {
     protected void doOKAction() {
         String projectViewVersionRule = StringUtils.trim(showMavenProjectVersionForm.getProjectViewVersionRuleTextField().getText());
         if (!ShowMavenProjectVersionHandler.INSTANCE.isAllowViewVersionRule(projectViewVersionRule)) {
-            Messages.showWarningDialog(project, String.format("project view version rule is not support, default rule: %s", Constants.DEFAULT_PROJECT_VIEW_VERSION_RULE), "Warning");
+            String message = LanguageUtils.parseValue(LanguageUtils.get(LanguageUtils.Constants.SHOW_FORM_TIP_PROJECT_VIEW_VERSION_RULE_NOT_SUPPORT_TEMPLATE_TEXT), SystemConstants.DEFAULT_VERSION_RULE, SystemConstants.DEFAULT_PROJECT_VIEW_VERSION_RULE);
+            MessagesUtils.showWarningDialog(project, message, LanguageUtils.get(LanguageUtils.Constants.MESSAGES_WARNING_TITLE));
             return;
         }
 
@@ -53,6 +56,7 @@ public class ShowMavenProjectVersionDialog extends DialogWrapper {
         ShowMavenProjectVersionHandler.INSTANCE.refreshMavenProjectView(project);
         ShowMavenProjectVersionHandler.INSTANCE.refreshMavenStructureView(project);
 
+        MessagesUtils.showInfoDialog(project, LanguageUtils.get(LanguageUtils.Constants.SHOW_INFO_SUCCESS_TEXT), LanguageUtils.get(LanguageUtils.Constants.MESSAGES_SUCCESS_TITLE));
         this.close(DialogWrapper.OK_EXIT_CODE);
     }
 

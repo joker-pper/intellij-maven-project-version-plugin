@@ -1,6 +1,6 @@
 package com.github.jokerpper.mavenprojectversion.handler;
 
-import com.github.jokerpper.mavenprojectversion.constants.Constants;
+import com.github.jokerpper.mavenprojectversion.constants.SystemConstants;
 import com.github.jokerpper.mavenprojectversion.state.ShowMavenProjectVersionState;
 import com.github.jokerpper.mavenprojectversion.util.IntellijUtils;
 import com.github.jokerpper.mavenprojectversion.util.StringUtils;
@@ -48,9 +48,9 @@ public class ShowMavenProjectVersionHandler {
         try {
             String projectViewVersionRule = showMavenProjectVersionState.getProjectViewVersionRule();
             if (!isAllowViewVersionRule(projectViewVersionRule)) {
-                projectViewVersionRule = Constants.DEFAULT_PROJECT_VIEW_VERSION_RULE;
+                projectViewVersionRule = SystemConstants.DEFAULT_PROJECT_VIEW_VERSION_RULE;
             }
-            versionRule = projectViewVersionRule.replace(Constants.DEFAULT_VERSION_RULE, "%s");
+            versionRule = projectViewVersionRule.replace(SystemConstants.DEFAULT_VERSION_RULE, "%s");
         } catch (Exception e) {
             versionRule = "%s";
         }
@@ -97,7 +97,7 @@ public class ShowMavenProjectVersionHandler {
     }
 
     public boolean isAllowViewVersionRule(String viewVersionRule) {
-        if (StringUtils.isEmpty(viewVersionRule) || !viewVersionRule.contains(Constants.DEFAULT_VERSION_RULE)) {
+        if (StringUtils.isEmpty(viewVersionRule) || !viewVersionRule.contains(SystemConstants.DEFAULT_VERSION_RULE)) {
             return false;
         }
         return true;

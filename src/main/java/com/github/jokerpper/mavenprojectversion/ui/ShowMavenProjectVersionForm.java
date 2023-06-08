@@ -1,6 +1,7 @@
 package com.github.jokerpper.mavenprojectversion.ui;
 
 import com.github.jokerpper.mavenprojectversion.state.ShowMavenProjectVersionState;
+import com.github.jokerpper.mavenprojectversion.support.LanguageUtils;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.uiDesigner.core.GridConstraints;
@@ -22,10 +23,12 @@ public class ShowMavenProjectVersionForm implements Disposable {
 
     public ShowMavenProjectVersionForm(Project project) {
         this.dialogPanel = new JPanel();
+        String showProjectViewText = LanguageUtils.get(LanguageUtils.Constants.SHOW_FORM_SHOW_PROJECT_VIEW_TEXT);
+        String showStructureViewText = LanguageUtils.get(LanguageUtils.Constants.SHOW_FORM_SHOW_STRUCTURE_VIEW_TEXT);
 
         ShowMavenProjectVersionState showMavenProjectVersionState = ShowMavenProjectVersionState.getInstance(project);
-        this.firstCheckBox = new JCheckBox(Constants.SHOW_PROJECT_VIEW_TEXT, showMavenProjectVersionState.isShowProjectView());
-        this.secondCheckBox = new JCheckBox(Constants.SHOW_STRUCTURE_VIEW_TEXT, showMavenProjectVersionState.isShowStructureView());
+        this.firstCheckBox = new JCheckBox(showProjectViewText, showMavenProjectVersionState.isShowProjectView());
+        this.secondCheckBox = new JCheckBox(showStructureViewText, showMavenProjectVersionState.isShowStructureView());
         this.projectViewVersionRuleTextField = new JTextField(showMavenProjectVersionState.getProjectViewVersionRule());
     }
 
@@ -33,7 +36,8 @@ public class ShowMavenProjectVersionForm implements Disposable {
 
         dialogPanel.setLayout(new GridLayoutManager(3, 2, JBUI.insets(0), -1, -1));
 
-        JLabel projectViewVersionRuleLabel = new JLabel(Constants.PROJECT_VIEW_VERSION_RULE_TEXT);
+        String projectViewVersionRuleText = LanguageUtils.get(LanguageUtils.Constants.SHOW_FORM_PROJECT_VIEW_VERSION_RULE_TEXT);
+        JLabel projectViewVersionRuleLabel = new JLabel(projectViewVersionRuleText);
         dialogPanel.add(projectViewVersionRuleLabel, new GridConstraints(0, 0, 1, 1,
                 GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
@@ -78,15 +82,6 @@ public class ShowMavenProjectVersionForm implements Disposable {
     @Override
     public void dispose() {
         dialogPanel.removeAll();
-    }
-
-    class Constants {
-
-        static final String SHOW_PROJECT_VIEW_TEXT = "Show Project View";
-
-        static final String SHOW_STRUCTURE_VIEW_TEXT = "Show Structure View";
-
-        static final String PROJECT_VIEW_VERSION_RULE_TEXT = "Project View Version Rule:";
     }
 
 }

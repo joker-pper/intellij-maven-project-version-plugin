@@ -1,6 +1,7 @@
 package com.github.jokerpper.mavenprojectversion.ui;
 
 import com.github.jokerpper.mavenprojectversion.strategy.impl.UpdateMavenProjectVersionStrategyEnum;
+import com.github.jokerpper.mavenprojectversion.support.LanguageUtils;
 import com.github.jokerpper.mavenprojectversion.util.StringUtils;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.ui.ComboBox;
@@ -38,7 +39,8 @@ public class UpdateMavenProjectVersionForm implements Disposable {
 
         this.projectComboBox = new ComboBox<>();
         this.newVersionTextField = new JTextField();
-        this.mustSameVersionCheckBox = new JCheckBox(Constants.MUST_SAME_VERSION_TEXT);
+        String mustSameVersionText = LanguageUtils.get(LanguageUtils.Constants.UPDATE_FORM_MUST_SAME_VERSION_TEXT);
+        this.mustSameVersionCheckBox = new JCheckBox(mustSameVersionText);
 
         init();
     }
@@ -81,7 +83,9 @@ public class UpdateMavenProjectVersionForm implements Disposable {
 
         dialogPanel.setLayout(new GridLayoutManager(5, 2, JBUI.insets(0), -1, -1));
 
-        JLabel strategyLabel = new JLabel(Constants.STRATEGY_TEXT);
+        String strategyText = LanguageUtils.get(LanguageUtils.Constants.UPDATE_FORM_STRATEGY_TEXT);
+
+        JLabel strategyLabel = new JLabel(strategyText);
         dialogPanel.add(strategyLabel, new GridConstraints(0, 0, 1, 1,
                 GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE,
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
@@ -91,8 +95,11 @@ public class UpdateMavenProjectVersionForm implements Disposable {
         JPanel strategyRadioDialogPanel = new JPanel();
         strategyRadioDialogPanel.setLayout(new GridLayoutManager(1, 2, JBUI.insets(0), -1, -1));
 
-        JRadioButton strategyRadioButton1 = new JRadioButton(Constants.STRATEGY_DEFAULT_TEXT, true);
-        JRadioButton strategyRadioButton2 = new JRadioButton(Constants.STRATEGY_GENERAL_TEXT);
+        String strategyDefaultText = LanguageUtils.get(LanguageUtils.Constants.UPDATE_FORM_STRATEGY_DEFAULT_TEXT);
+        String strategyGeneralText = LanguageUtils.get(LanguageUtils.Constants.UPDATE_FORM_STRATEGY_GENERAL_TEXT);
+
+        JRadioButton strategyRadioButton1 = new JRadioButton(strategyDefaultText, true);
+        JRadioButton strategyRadioButton2 = new JRadioButton(strategyGeneralText);
 
         strategyRadioBtnGroup.add(strategyRadioButton1);
         strategyRadioBtnGroup.add(strategyRadioButton2);
@@ -115,8 +122,9 @@ public class UpdateMavenProjectVersionForm implements Disposable {
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
                 null, null, null));
+        String mavenProjectText = LanguageUtils.get(LanguageUtils.Constants.UPDATE_FORM_MAVEN_PROJECT_TEXT);
 
-        JLabel projectLabel = new JLabel(Constants.MAVEN_PROJECT_TEXT);
+        JLabel projectLabel = new JLabel(mavenProjectText);
         dialogPanel.add(projectLabel, new GridConstraints(1, 0, 1, 1,
                 GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE,
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
@@ -129,7 +137,8 @@ public class UpdateMavenProjectVersionForm implements Disposable {
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
                 new Dimension(300, 30), null, null));
 
-        JLabel newVersionLabel = new JLabel(Constants.NEW_VERSION_TEXT);
+        String newVersionText = LanguageUtils.get(LanguageUtils.Constants.UPDATE_FORM_NEW_VERSION_TEXT);
+        JLabel newVersionLabel = new JLabel(newVersionText);
         dialogPanel.add(newVersionLabel, new GridConstraints(2, 0, 1, 1,
                 GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE,
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
@@ -185,26 +194,9 @@ public class UpdateMavenProjectVersionForm implements Disposable {
         return null;
     }
 
-
     @Override
     public void dispose() {
         dialogPanel.removeAll();
-    }
-
-    class Constants {
-
-        static final String STRATEGY_TEXT = "Strategy:";
-
-        static final String STRATEGY_DEFAULT_TEXT = "Default";
-
-        static final String STRATEGY_GENERAL_TEXT = "General";
-
-        static final String MAVEN_PROJECT_TEXT = "Maven Project:";
-
-        static final String NEW_VERSION_TEXT = "New Version:";
-
-        static final String MUST_SAME_VERSION_TEXT = "Must Same Version";
-
     }
 
     class CustomListCellRenderer extends DefaultListCellRenderer {

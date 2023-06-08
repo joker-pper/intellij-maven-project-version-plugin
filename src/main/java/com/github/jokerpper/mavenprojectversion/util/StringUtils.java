@@ -19,6 +19,10 @@ public class StringUtils {
         return value == null || value.isEmpty();
     }
 
+    public static boolean isNotEmpty(String value) {
+        return !isEmpty(value);
+    }
+
     public static boolean equals(String value1, String value2) {
         if (value1 == value2) {
             return true;

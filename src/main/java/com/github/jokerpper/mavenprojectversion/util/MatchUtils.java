@@ -8,17 +8,25 @@ import java.util.List;
 
 public class MatchUtils {
 
-    public static boolean isMatchProject(String rootProjectGroupId, List<String> projectAllArtifactIdList, MavenId mavenId) {
+    /**
+     * 获取是否为rootProject所匹配的project
+     *
+     * @param rootProjectGroupId
+     * @param rootProjectAllArtifactIdList
+     * @param mavenId
+     * @return
+     */
+    public static boolean isMatchProject(String rootProjectGroupId, List<String> rootProjectAllArtifactIdList, MavenId mavenId) {
         return StringUtils.equals(rootProjectGroupId, StringUtils.trim(mavenId.getGroupId())) &&
-                projectAllArtifactIdList.contains(StringUtils.trim(mavenId.getArtifactId()));
+                rootProjectAllArtifactIdList.contains(StringUtils.trim(mavenId.getArtifactId()));
     }
 
-    public static boolean isMatchProjectParent(String rootProjectGroupId, List<String> projectAllArtifactIdList, MavenDomParent mavenDomParent) {
+    public static boolean isMatchProjectParent(String rootProjectGroupId, List<String> rootProjectAllArtifactIdList, MavenDomParent mavenDomParent) {
         return rootProjectGroupId.equals(StringUtils.trim(mavenDomParent.getGroupId().getRawText())) &&
-                projectAllArtifactIdList.contains(StringUtils.trim(mavenDomParent.getArtifactId().getRawText()));
+                rootProjectAllArtifactIdList.contains(StringUtils.trim(mavenDomParent.getArtifactId().getRawText()));
     }
 
-    public static boolean isMatchMavenDomDependency(String rootProjectGroupId, List<String> projectAllArtifactIdList, MavenDomDependency domDependency) {
-        return rootProjectGroupId.equals(StringUtils.trim(domDependency.getGroupId().getRawText())) && projectAllArtifactIdList.contains(StringUtils.trim(domDependency.getArtifactId().getRawText()));
+    public static boolean isMatchMavenDomDependency(String rootProjectGroupId, List<String> rootProjectAllArtifactIdList, MavenDomDependency domDependency) {
+        return rootProjectGroupId.equals(StringUtils.trim(domDependency.getGroupId().getRawText())) && rootProjectAllArtifactIdList.contains(StringUtils.trim(domDependency.getArtifactId().getRawText()));
     }
 }

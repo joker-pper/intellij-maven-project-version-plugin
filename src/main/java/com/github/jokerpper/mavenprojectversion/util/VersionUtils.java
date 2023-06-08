@@ -4,6 +4,12 @@ import java.util.Arrays;
 
 public class VersionUtils {
 
+    /**
+     * 是否为特殊版本值
+     *
+     * @param version
+     * @return
+     */
     public static boolean isSpecialVersion(String version) {
         for (String special : Arrays.asList("$", "(", "[", ")", "]")) {
             if (version.contains(special)) {

@@ -1,6 +1,6 @@
 package com.github.jokerpper.mavenprojectversion.state;
 
-import com.github.jokerpper.mavenprojectversion.constants.Constants;
+import com.github.jokerpper.mavenprojectversion.constants.SystemConstants;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
@@ -17,7 +17,7 @@ public class ShowMavenProjectVersionState implements PersistentStateComponent<Sh
 
     private boolean showStructureView = false;
 
-    private String projectViewVersionRule = Constants.DEFAULT_PROJECT_VIEW_VERSION_RULE;
+    private String projectViewVersionRule = SystemConstants.DEFAULT_PROJECT_VIEW_VERSION_RULE;
 
     public boolean isShowProjectView() {
         return showProjectView;
