@@ -97,7 +97,7 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
         doOKActionInit();
 
         if (!updateMavenProjectVersionStrategyEnum.checkVersionPass(project, updateMavenProjectVersionForm)) {
-            //检查版本通过后
+            //检查版本不通过
             return;
         }
 
