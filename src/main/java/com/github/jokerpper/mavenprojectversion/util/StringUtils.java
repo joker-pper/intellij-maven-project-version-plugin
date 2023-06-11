@@ -1,6 +1,14 @@
 package com.github.jokerpper.mavenprojectversion.util;
 
 
+import org.apache.http.util.CharArrayBuffer;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+
 public class StringUtils {
 
     public static String trim(String value) {
@@ -31,5 +39,25 @@ public class StringUtils {
             return value1.equals(value2);
         }
         return false;
+    }
+
+    public static String toString(InputStream inStream, Charset charset) throws IOException {
+        if (inStream == null) {
+            return null;
+        }
+
+        try {
+            int capacity = 4096;
+            final Reader reader = new InputStreamReader(inStream, charset);
+            final CharArrayBuffer buffer = new CharArrayBuffer(capacity);
+            final char[] tmp = new char[1024];
+            int l;
+            while ((l = reader.read(tmp)) != -1) {
+                buffer.append(tmp, 0, l);
+            }
+            return buffer.toString();
+        } finally {
+            inStream.close();
+        }
     }
 }

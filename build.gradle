@@ -1,13 +1,31 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.7.2'
+    id 'org.jetbrains.intellij' version '1.1'
+    //id 'org.jetbrains.intellij' version '0.7.2'
 }
 
 group 'com.github.joker-pper'
 version '1.0.1'
 
+//指定编译版本
+sourceCompatibility = 1.8
+
 repositories {
+    maven {
+        url 'https://maven.aliyun.com/repository/public/'
+    }
+
+    maven {
+        url 'https://maven.aliyun.com/repository/gradle-plugin'
+    }
+
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+
+    mavenLocal()
     mavenCentral()
+
 }
 
 dependencies {
@@ -16,14 +34,19 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2020.2'
+    version = '2020.2'
     plugins = ['maven', 'java']
-    updateSinceUntilBuild false
+
+    //version = '2017.3'
+    //version = '2018.3'
+    //plugins = ['maven']
+
+    updateSinceUntilBuild = false
 }
 
 patchPluginXml {
 
-    changeNotes """<pre>
+    changeNotes = """<pre>
 v1.0.1
 </pre>"""
 

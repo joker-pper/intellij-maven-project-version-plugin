@@ -2,8 +2,8 @@ package com.github.jokerpper.mavenprojectversion.support;
 
 import com.github.jokerpper.mavenprojectversion.constants.SystemConstants;
 import com.github.jokerpper.mavenprojectversion.util.PropertiesUtils;
+import com.github.jokerpper.mavenprojectversion.util.ResourceUtils;
 import com.github.jokerpper.mavenprojectversion.util.StringUtils;
-import com.intellij.util.ResourceUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,8 +33,25 @@ public class LanguageUtils {
      * @param values
      * @return
      */
-    public static String parseValue(String source, Object... values) {
+    public static String parseTemplateValue(String source, Object... values) {
         return String.format(source.replace("{}", "%s"), values);
+    }
+
+    /**
+     * 获取转换后的值
+     *
+     * @param key
+     * @param values
+     * @return
+     */
+    public static String parseTemplateValueByKey(String key, Object... values) {
+        String currentLanguage = getCurrentLanguage();
+        String source = get(key, currentLanguage);
+        try {
+            return parseTemplateValue(source, values);
+        } catch (Exception exception) {
+            throw new RuntimeException(String.format("Parse Template Value Fail, Please Check Language Configuration And To Fix! Language: %s, Language Key: %s, Language Key Value: %s", currentLanguage, key, source), exception);
+        }
     }
 
     /**
@@ -86,6 +103,7 @@ public class LanguageUtils {
         public static String OK_BUTTON_TEXT = "ok_button_text";
         public static String CANCEL_BUTTON_TEXT = "cancel_button_text";
         public static String MESSAGES_TIP_OK_TEXT = "messages_tip_ok_text";
+        public static String MESSAGES_SHOW_DEFAULT_ERROR_MORE_INFO_DIALOG_MESSAGE_TEXT = "messages_show_default_error_more_info_dialog_message_text";
 
 
         public static String UPDATE_MAVEN_PROJECT_VERSION_TITLE = "update_maven_project_version.title";
@@ -148,7 +166,7 @@ public class LanguageUtils {
 
         static void initSysCache(String language) {
             String languageFile = language + SystemConstants.PROPERTIES_FILE_SUFFIX;
-            InputStream inputStream = ResourceUtil.getResourceAsStream(LanguageUtils.class, SYS_LANGUAGE_DIR, languageFile);
+            InputStream inputStream = ResourceUtils.getResourceAsStream(LanguageUtils.class, SYS_LANGUAGE_DIR, languageFile);
             if (inputStream != null) {
                 Properties properties = new Properties();
                 try {

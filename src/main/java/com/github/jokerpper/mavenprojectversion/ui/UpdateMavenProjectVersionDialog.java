@@ -1,11 +1,13 @@
 package com.github.jokerpper.mavenprojectversion.ui;
 
+import com.github.jokerpper.mavenprojectversion.constants.SystemConstants;
 import com.github.jokerpper.mavenprojectversion.model.UpdateMavenProjectOptions;
 import com.github.jokerpper.mavenprojectversion.model.UpdateMavenVersionEffectModel;
 import com.github.jokerpper.mavenprojectversion.strategy.impl.UpdateMavenProjectVersionStrategyEnum;
 import com.github.jokerpper.mavenprojectversion.support.LanguageUtils;
 import com.github.jokerpper.mavenprojectversion.support.MessagesUtils;
 import com.github.jokerpper.mavenprojectversion.support.UpdateMavenVersionEffectUtils;
+import com.github.jokerpper.mavenprojectversion.util.DateFormatUtils;
 import com.github.jokerpper.mavenprojectversion.util.IntellijUtils;
 import com.github.jokerpper.mavenprojectversion.util.MatchUtils;
 import com.github.jokerpper.mavenprojectversion.util.StringUtils;
@@ -31,6 +33,7 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -50,10 +53,12 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
     private UpdateMavenProjectVersionStrategyEnum updateMavenProjectVersionStrategyEnum;
 
     private String newVersion;
-    private Exception updateVersionException;
+    private Throwable updateVersionThrowable;
     private int updateVersionEffectSize;
     private List<UpdateMavenVersionEffectModel> updateMavenVersionEffectModelList;
 
+    private Date updateStartTime;
+    private Date updateEndTime;
 
     public UpdateMavenProjectVersionDialog(@Nullable Project project, boolean canBeParent) {
         super(project, canBeParent);
@@ -87,9 +92,11 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
         this.rootProjectGroupId = StringUtils.trim(rootProject.getMavenId().getGroupId());
         this.updateMavenProjectVersionStrategyEnum = updateMavenProjectVersionForm.getUpdateMavenProjectVersionStrategy();
         this.newVersion = updateMavenProjectVersionForm.getNewVersion();
-        this.updateVersionException = null;
+        this.updateVersionThrowable = null;
         this.updateVersionEffectSize = 0;
         this.updateMavenVersionEffectModelList = new ArrayList<>(64);
+        this.updateStartTime = new Date();
+        this.updateEndTime = null;
     }
 
     @Override
@@ -103,23 +110,28 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
 
         //检查版本通过后执行更新版本操作
         WriteCommandAction.runWriteCommandAction(project, this::updateVersion);
-        if (updateVersionException != null) {
-            MessagesUtils.showErrorDialog(project, this.updateVersionException.getMessage(), LanguageUtils.get(LanguageUtils.Constants.MESSAGES_ERROR_TITLE));
+        if (updateVersionThrowable != null) {
+            MessagesUtils.showErrorDetailInfoDialog(project, updateVersionThrowable);
         } else {
-            if (updateVersionEffectSize == 0) {
-                MessagesUtils.showErrorDialog(project, LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_UPDATE_VERSION_EFFECT_SIZE_IS_ZERO_TEXT), LanguageUtils.get(LanguageUtils.Constants.MESSAGES_ERROR_TITLE));
-            } else {
-                String effectDetail = UpdateMavenVersionEffectUtils.format(rootProjectGroupId, updateMavenVersionEffectModelList, newVersion, LanguageUtils.getCurrentLanguage());
-                //更新版本影响个数: xxx, 详细: xxx
-                String message = LanguageUtils.parseValue(LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_SUCCESS_TEMPLATE), updateVersionEffectSize, "\r\n" + effectDetail);
-                MessagesUtils.showMoreInfoDialog(project, message, LanguageUtils.get(LanguageUtils.Constants.MESSAGES_SUCCESS_TITLE));
+            try {
+                if (updateVersionEffectSize == 0) {
+                    MessagesUtils.showErrorDialog(project, LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_UPDATE_VERSION_EFFECT_SIZE_IS_ZERO_TEXT), LanguageUtils.get(LanguageUtils.Constants.MESSAGES_ERROR_TITLE));
+                } else {
+                    //影响详细
+                    String effectDetail = UpdateMavenVersionEffectUtils.format(rootProjectGroupId, updateMavenVersionEffectModelList, newVersion, LanguageUtils.getCurrentLanguage());
+                    //更新版本信息
+                    String message = LanguageUtils.parseTemplateValueByKey(LanguageUtils.Constants.UPDATE_INFO_SUCCESS_TEMPLATE, SystemConstants.IDEA_PRODUCT_FULL_NAME, DateFormatUtils.formatDateTime(updateStartTime), DateFormatUtils.formatDateTime(updateEndTime), updateVersionEffectSize);
+                    MessagesUtils.showMoreInfoDialog(project, message, LanguageUtils.get(LanguageUtils.Constants.MESSAGES_SUCCESS_TITLE), effectDetail);
+                }
+            } catch (Throwable throwable) {
+                MessagesUtils.showErrorDetailInfoDialog(project, throwable);
             }
         }
     }
 
 
     private void updateVersion() {
-        boolean hasException = false;
+        boolean hasThrowable = false;
 
         final Set<String> rootProjectModulePaths = rootProject.getModulePaths();
         final List<String> rootProjectAllArtifactIdList = new ArrayList<>(64);
@@ -174,14 +186,15 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
                 //resolve current project dependencyManagement dependencies
                 updateProjectDependencyManagementDependencyVersion(rootProjectGroupId, rootProjectAllArtifactIdList, rootElement, updateMavenProjectOptions);
             }
-        } catch (Exception exception) {
-            hasException = true;
-            updateVersionException = exception;
+        } catch (Throwable throwable) {
+            hasThrowable = true;
+            updateVersionThrowable = throwable;
         } finally {
-            if (!hasException) {
+            if (!hasThrowable) {
                 FileDocumentManager.getInstance().saveAllDocuments();
             }
             projectsManager.forceUpdateProjects(projects);
+            updateEndTime = new Date();
             this.close(DialogWrapper.OK_EXIT_CODE);
         }
     }

@@ -61,7 +61,7 @@ public class UpdateMavenVersionEffectUtils {
                 sb.append("}");
 
                 //显示版本值
-                sb.append(String.format("%s: %s\r\n", LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_VERSION_TEXT, language), projectDetail.getVersion()));
+                sb.append(String.format("\r\n%s: %s\r\n", LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_VERSION_TEXT, language), projectDetail.getVersion()));
 
                 sb.append("\r\n");
             }
@@ -89,7 +89,7 @@ public class UpdateMavenVersionEffectUtils {
                     sb.append("}");
 
                     //显示版本值
-                    sb.append(String.format("%s: %s\r\n", LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_VERSION_TEXT, language), projectParentDetail.getVersion()));
+                    sb.append(String.format("\r\n%s: %s\r\n", LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_VERSION_TEXT, language), projectParentDetail.getVersion()));
 
                     sb.append("\r\n");
                 }
