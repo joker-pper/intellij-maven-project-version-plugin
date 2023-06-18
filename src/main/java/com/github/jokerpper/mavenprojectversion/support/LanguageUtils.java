@@ -145,8 +145,6 @@ public class LanguageUtils {
 
         static Map<String, Properties> USER_LAN_CACHE = new HashMap<>(64);
 
-        static Properties USER_CONF_CACHE = new Properties();
-
         /**
          * 使用的语言
          */
@@ -188,16 +186,6 @@ public class LanguageUtils {
             USER_LAN_CACHE.putAll(languagePropertiesMap);
         }
 
-        /**
-         * 初始化用户定义配置
-         *
-         * @param userConfProperties
-         */
-        static void initUserConfCache(Properties userConfProperties) {
-            USER_CONF_CACHE.clear();
-            USER_CONF_CACHE.putAll(userConfProperties);
-        }
-
 
         /**
          * 初始化用户使用的语言
@@ -212,7 +200,7 @@ public class LanguageUtils {
          * @return
          */
         private static String getUsedLanguage() {
-            String language = USER_CONF_CACHE.getProperty(USER_CONF_LANGUAGE_KEY);
+            String language = UserConfUtils.getProperty(USER_CONF_LANGUAGE_KEY);
             String connector = "_";
 
             if (StringUtils.isEmpty(language)) {

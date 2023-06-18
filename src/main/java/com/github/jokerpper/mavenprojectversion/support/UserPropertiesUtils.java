@@ -51,7 +51,7 @@ public class UserPropertiesUtils {
         init(projectParentDir, PROJECT_CONF_PROPERTIES, PROJECT_LAN_CACHE);
 
         //初始化配置
-        LanguageUtils.Constants.initUserConfCache(getUserConfProperties());
+        UserConfUtils.initUserConfCache(getUserConfProperties());
 
         //初始化语言资源及使用的语言
         LanguageUtils.Constants.initUserCache(getUserLanguageMap());
