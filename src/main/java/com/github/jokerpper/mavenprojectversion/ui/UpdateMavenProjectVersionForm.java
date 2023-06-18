@@ -2,6 +2,7 @@ package com.github.jokerpper.mavenprojectversion.ui;
 
 import com.github.jokerpper.mavenprojectversion.strategy.impl.UpdateMavenProjectVersionStrategyEnum;
 import com.github.jokerpper.mavenprojectversion.support.LanguageUtils;
+import com.github.jokerpper.mavenprojectversion.support.UserConfUtils;
 import com.github.jokerpper.mavenprojectversion.util.StringUtils;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.ui.ComboBox;
@@ -13,11 +14,30 @@ import org.jetbrains.idea.maven.project.MavenProject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
+import java.util.*;
 
 public class UpdateMavenProjectVersionForm implements Disposable {
+
+    private static final String MIN_WIDTH_KEY = "update_version_form.min_width";
+
+    private static final String MAX_WIDTH_KEY = "update_version_form.max_width";
+
+    private static final int DEFAULT_MIN_WIDTH = 300;
+
+    private static final int DEFAULT_MAX_WIDTH = 420;
+
+    private static final int DIALOG_PANEL_HEIGTH = 120;
+
+    /**
+     * 最小宽度
+     */
+    private final int MIN_WIDTH;
+
+    /**
+     * 最大宽度，-1时无限制
+     */
+    private final int MAX_WIDTH;
 
     private final List<MavenProject> rootProjects;
     private final JPanel dialogPanel;
@@ -42,6 +62,9 @@ public class UpdateMavenProjectVersionForm implements Disposable {
         String mustSameVersionText = LanguageUtils.get(LanguageUtils.Constants.UPDATE_FORM_MUST_SAME_VERSION_TEXT);
         this.mustSameVersionCheckBox = new JCheckBox(mustSameVersionText);
 
+        MIN_WIDTH = UserConfUtils.getProperty(int.class, MIN_WIDTH_KEY, DEFAULT_MIN_WIDTH);
+        MAX_WIDTH = UserConfUtils.getProperty(int.class, MAX_WIDTH_KEY, DEFAULT_MAX_WIDTH);
+
         init();
     }
 
@@ -52,13 +75,24 @@ public class UpdateMavenProjectVersionForm implements Disposable {
                 initRootProjectAndOldVersion((MavenProject) item);
             }
         });
-        projectComboBox.setRenderer(new CustomListCellRenderer());
+
+        //获取重复出现的root project (以groupId + artifactId为标识判断)
+        Set<String> mavenShowWithoutVersionContents = new HashSet<>(rootProjects.size());
+        Set<String> repeatMavenShowRootProjectContents = new HashSet<>(16);
+        for (MavenProject mavenProject : rootProjects) {
+            String content = formatDefaultContent(mavenProject, false);
+            if (mavenShowWithoutVersionContents.contains(content)) {
+                repeatMavenShowRootProjectContents.add(content);
+            } else {
+                mavenShowWithoutVersionContents.add(content);
+            }
+        }
+
+        projectComboBox.setRenderer(new CustomListCellRenderer(repeatMavenShowRootProjectContents));
 
         for (MavenProject mavenProject : rootProjects) {
             projectComboBox.addItem(mavenProject);
         }
-
-        initStyle();
     }
 
     private void initRootProjectAndOldVersion(MavenProject project) {
@@ -67,16 +101,33 @@ public class UpdateMavenProjectVersionForm implements Disposable {
         this.newVersionTextField.setText(this.oldVersion);
     }
 
-    private void initStyle() {
-        Dimension projectComboBoxDimension = projectComboBox.getSize();
-        if (projectComboBoxDimension.getWidth() > 0) {
-            Dimension newVersionTextFieldSize = newVersionTextField.getSize();
-            if (newVersionTextFieldSize.getWidth() < projectComboBoxDimension.getWidth()) {
-                newVersionTextField.setSize(projectComboBoxDimension);
-            }
-        } else {
-            newVersionTextField.setPreferredSize(projectComboBox.getMinimumSize());
+    private Dimension initMyDimension() {
+
+        Dimension projectComboBoxSize = projectComboBox.getSize();
+        Dimension projectComboBoxMinimumSize = projectComboBox.getMinimumSize();
+
+        int projectComboBoxWidth = (int) projectComboBoxSize.getWidth();
+        int projectComboBoxHeight = (int) projectComboBoxSize.getHeight();
+        if (projectComboBoxWidth < projectComboBoxMinimumSize.getWidth()) {
+            projectComboBoxWidth = (int) projectComboBoxMinimumSize.getWidth();
         }
+
+        if (projectComboBoxHeight < projectComboBoxMinimumSize.getHeight()) {
+            projectComboBoxHeight = (int) projectComboBoxMinimumSize.getHeight();
+        }
+
+        Dimension resultSize;
+        if (projectComboBoxWidth <= MIN_WIDTH) {
+            //最小宽度
+            resultSize = new Dimension(MIN_WIDTH, projectComboBoxHeight);
+        } else if (projectComboBoxWidth <= MAX_WIDTH || MAX_WIDTH <= 0) {
+            //自身宽度
+            resultSize = new Dimension(projectComboBoxWidth, projectComboBoxHeight);
+        } else {
+            //最大宽度
+            resultSize = new Dimension(MAX_WIDTH, projectComboBoxHeight);
+        }
+        return resultSize;
     }
 
     public JPanel getJPanelContent() {
@@ -131,11 +182,13 @@ public class UpdateMavenProjectVersionForm implements Disposable {
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
                 null, null, null));
 
+        Dimension myDimension = initMyDimension();
+
         dialogPanel.add(projectComboBox, new GridConstraints(1, 1, 1, 1,
                 GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                new Dimension(300, 30), null, null));
+                myDimension, myDimension, null));
 
         String newVersionText = LanguageUtils.get(LanguageUtils.Constants.UPDATE_FORM_NEW_VERSION_TEXT);
         JLabel newVersionLabel = new JLabel(newVersionText);
@@ -149,7 +202,7 @@ public class UpdateMavenProjectVersionForm implements Disposable {
                 GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
                 GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                new Dimension(300, 30), null, null));
+                myDimension, myDimension, null));
 
 
         dialogPanel.add(mustSameVersionCheckBox, new GridConstraints(3, 1, 1, 1,
@@ -159,7 +212,7 @@ public class UpdateMavenProjectVersionForm implements Disposable {
                 null, null, null));
 
 
-        dialogPanel.setMinimumSize(new Dimension(300, 120));
+        dialogPanel.setMinimumSize(new Dimension(MIN_WIDTH, DIALOG_PANEL_HEIGTH));
 
         return dialogPanel;
     }
@@ -200,13 +253,37 @@ public class UpdateMavenProjectVersionForm implements Disposable {
     }
 
     class CustomListCellRenderer extends DefaultListCellRenderer {
+
+        private Set<String> repeatMavenShowRootProjectContents;
+
+        public CustomListCellRenderer(Set<String> repeatMavenShowRootProjectContents) {
+            this.repeatMavenShowRootProjectContents = repeatMavenShowRootProjectContents;
+        }
+
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             MavenProject mavenProject = (MavenProject) value;
-            MavenId mavenId = mavenProject.getMavenId();
-            String content = String.format("%s:%s(%s)", StringUtils.trim(mavenId.getGroupId()), StringUtils.trim(mavenId.getArtifactId()), StringUtils.trim(mavenId.getVersion()));
+            String withoutVersionContent = formatDefaultContent(mavenProject, false);
+            String content;
+            if (repeatMavenShowRootProjectContents.contains(withoutVersionContent)) {
+                content = formatRepeatContent(mavenProject);
+            } else {
+                content = formatDefaultContent(mavenProject, true);
+            }
             return super.getListCellRendererComponent(list, content, index, isSelected, cellHasFocus);
         }
     }
 
+    private String formatDefaultContent(MavenProject mavenProject, boolean withVersion) {
+        MavenId mavenId = mavenProject.getMavenId();
+        if (withVersion) {
+            return String.format("%s:%s(%s)", StringUtils.trim(mavenId.getGroupId()), StringUtils.trim(mavenId.getArtifactId()), StringUtils.trim(mavenId.getVersion()));
+        }
+        return String.format("%s:%s", StringUtils.trim(mavenId.getGroupId()), StringUtils.trim(mavenId.getArtifactId()));
+    }
+
+    private String formatRepeatContent(MavenProject mavenProject) {
+        MavenId mavenId = mavenProject.getMavenId();
+        return String.format("[%s]%s:%s(%s)", mavenProject.getFile().getParent().getName(), StringUtils.trim(mavenId.getGroupId()), StringUtils.trim(mavenId.getArtifactId()), StringUtils.trim(mavenId.getVersion()));
+    }
 }
