@@ -32,10 +32,7 @@ import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class UpdateMavenProjectVersionDialog extends DialogWrapper {
 
@@ -50,6 +47,7 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
 
     private MavenProject rootProject;
     private String rootProjectGroupId;
+    private String rootProjectArtifactId;
     private UpdateMavenProjectVersionStrategyEnum updateMavenProjectVersionStrategyEnum;
 
     private String newVersion;
@@ -90,6 +88,7 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
     private void doOKActionInit() {
         this.rootProject = updateMavenProjectVersionForm.getRootProject();
         this.rootProjectGroupId = StringUtils.trim(rootProject.getMavenId().getGroupId());
+        this.rootProjectArtifactId = StringUtils.trim(rootProject.getMavenId().getArtifactId());
         this.updateMavenProjectVersionStrategyEnum = updateMavenProjectVersionForm.getUpdateMavenProjectVersionStrategy();
         this.newVersion = updateMavenProjectVersionForm.getNewVersion();
         this.updateVersionThrowable = null;
@@ -118,7 +117,7 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
                     MessagesUtils.showErrorDialog(project, LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_UPDATE_VERSION_EFFECT_SIZE_IS_ZERO_TEXT), LanguageUtils.get(LanguageUtils.Constants.MESSAGES_ERROR_TITLE));
                 } else {
                     //影响详细
-                    String effectDetail = UpdateMavenVersionEffectUtils.format(rootProjectGroupId, updateMavenVersionEffectModelList, newVersion, LanguageUtils.getCurrentLanguage());
+                    String effectDetail = UpdateMavenVersionEffectUtils.format(rootProjectGroupId, rootProjectArtifactId, updateMavenVersionEffectModelList, newVersion, LanguageUtils.getCurrentLanguage());
                     //更新版本信息
                     String message = LanguageUtils.parseTemplateValueByKey(LanguageUtils.Constants.UPDATE_INFO_SUCCESS_TEMPLATE, SystemConstants.IDEA_PRODUCT_FULL_NAME, DateFormatUtils.formatDateTime(updateStartTime), DateFormatUtils.formatDateTime(updateEndTime), updateVersionEffectSize);
                     MessagesUtils.showMoreInfoDialog(project, message, LanguageUtils.get(LanguageUtils.Constants.MESSAGES_SUCCESS_TITLE), effectDetail);
@@ -136,26 +135,44 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
         final Set<String> rootProjectModulePaths = rootProject.getModulePaths();
         final List<String> rootProjectAllArtifactIdList = new ArrayList<>(64);
         final List<MavenProject> toResolveMavenProjects = new ArrayList<>(64);
+        final Set<String> rootProjectAllModulePaths;
 
         try {
             toResolveMavenProjects.add(rootProject);
             rootProjectAllArtifactIdList.add(StringUtils.trim(rootProject.getMavenId().getArtifactId()));
 
-            for (MavenProject mavenProject : projects) {
-                MavenId mavenId = mavenProject.getMavenId();
-                //是否需要处理的mavenProject（属于rootProject的module）
-                boolean isMatchToResolve = rootProjectModulePaths.contains(mavenProject.getPath());
-                if (!isMatchToResolve) {
-                    continue;
-                }
-                toResolveMavenProjects.add(mavenProject);
-                boolean isSameProjectGroupId = StringUtils.equals(rootProjectGroupId, StringUtils.trim(mavenProject.getMavenId().getGroupId()));
-                if (isSameProjectGroupId) {
-                    String mavenProjectArtifactId = StringUtils.trim(mavenId.getArtifactId());
-                    rootProjectAllArtifactIdList.add(mavenProjectArtifactId);
-                }
-            }
+            if (rootProjectModulePaths != null && !rootProjectModulePaths.isEmpty()) {
+                //存在多模块时
 
+                rootProjectAllModulePaths = new LinkedHashSet<>(32);
+
+                //获取rootProject下的所有module paths
+                toMatchProjectAllModulePaths(rootProjectModulePaths, rootProjectAllModulePaths);
+
+                List<MavenProject> toResolveChildMavenProjects = new ArrayList<>(rootProjectAllModulePaths.size());
+                for (MavenProject mavenProject : projects) {
+                    MavenId mavenId = mavenProject.getMavenId();
+                    //是否需要处理的mavenProject（属于rootProject下的module）
+                    boolean isMatchToResolve = rootProjectAllModulePaths.contains(mavenProject.getPath());
+                    if (!isMatchToResolve) {
+                        continue;
+                    }
+                    toResolveChildMavenProjects.add(mavenProject);
+                    boolean isSameProjectGroupId = StringUtils.equals(rootProjectGroupId, StringUtils.trim(mavenId.getGroupId()));
+                    if (isSameProjectGroupId) {
+                        String mavenProjectArtifactId = StringUtils.trim(mavenId.getArtifactId());
+                        rootProjectAllArtifactIdList.add(mavenProjectArtifactId);
+                    }
+                }
+
+                //将待处理的子模块进行排序
+                List<String> sortModuleKeys = new ArrayList<>(rootProjectAllModulePaths);
+                toResolveChildMavenProjects.sort(Comparator.comparing((mavenProject) -> {
+                    int index = sortModuleKeys.indexOf(mavenProject.getPath());
+                    return index == -1 ? Integer.MAX_VALUE : index;
+                }));
+                toResolveMavenProjects.addAll(toResolveChildMavenProjects);
+            }
 
             for (MavenProject toResolveMavenProject : toResolveMavenProjects) {
                 VirtualFile virtualFile = toResolveMavenProject.getFile();
@@ -196,6 +213,28 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
             projectsManager.forceUpdateProjects(projects);
             updateEndTime = new Date();
             this.close(DialogWrapper.OK_EXIT_CODE);
+        }
+    }
+
+
+    /**
+     * 匹配Match Paths下所有的Module Paths
+     *
+     * @param projectModuleMatchPaths
+     * @param rootProjectAllModulePaths
+     */
+    private void toMatchProjectAllModulePaths(Set<String> projectModuleMatchPaths, Set<String> rootProjectAllModulePaths) {
+        for (String projectModuleMatchPath : projectModuleMatchPaths) {
+            MavenProject mavenProject = projects.stream().filter(it -> StringUtils.equals(projectModuleMatchPath, it.getPath())).findFirst().orElse(null);
+            if (mavenProject == null) {
+                continue;
+            }
+            rootProjectAllModulePaths.add(projectModuleMatchPath);
+            Set<String> projectModulePaths = mavenProject.getModulePaths();
+            if (projectModulePaths == null || projectModulePaths.isEmpty()) {
+                continue;
+            }
+            toMatchProjectAllModulePaths(projectModulePaths, rootProjectAllModulePaths);
         }
     }
 

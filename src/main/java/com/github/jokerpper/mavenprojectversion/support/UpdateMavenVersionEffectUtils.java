@@ -17,12 +17,13 @@ public class UpdateMavenVersionEffectUtils {
      * 格式化显示
      *
      * @param rootProjectGroupId
+     * @param rootProjectArtifactId
      * @param updateMavenVersionEffectModelList
      * @param newVersion
      * @param language
      * @return
      */
-    public static String format(String rootProjectGroupId, List<UpdateMavenVersionEffectModel> updateMavenVersionEffectModelList, String newVersion, String language) {
+    public static String format(String rootProjectGroupId, String rootProjectArtifactId, List<UpdateMavenVersionEffectModel> updateMavenVersionEffectModelList, String newVersion, String language) {
         StringBuilder sb = new StringBuilder();
         sb.append("------------------------------------\r\n");
         if (updateMavenVersionEffectModelList.isEmpty()) {
@@ -77,14 +78,19 @@ public class UpdateMavenVersionEffectUtils {
                     sb.append(String.format("%s: %s -> %s\r\n", LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_CHANGE_VERSION_TEXT, language), projectParentDetail.getVersion(), newVersion));
                 } else {
                     //未修改版本
-
                     sb.append("{");
                     //显示未修改及缘由
                     if (!StringUtils.equals(rootProjectGroupId, projectParentDetail.getGroupId())) {
                         //来自外部groupId
                         sb.append(LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_NOT_CHANGE_VERSION_WITH_FROM_OUTSIDE_TEXT, language));
                     } else {
-                        sb.append(LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_NOT_CHANGE_VERSION_WITH_FROM_INSIDE_OTHER_TEXT, language));
+                        //是否为root的parent
+                        boolean isRootProjectParent = StringUtils.equals(rootProjectGroupId, projectDetail.getGroupId()) && StringUtils.equals(rootProjectArtifactId, projectDetail.getArtifactId());
+                        if (isRootProjectParent) {
+                            sb.append(LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_NOT_CHANGE_VERSION_WITH_DEFAULT_TEXT, language));
+                        } else {
+                            sb.append(LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_NOT_CHANGE_VERSION_WITH_FROM_INSIDE_OTHER_TEXT, language));
+                        }
                     }
                     sb.append("}");
 

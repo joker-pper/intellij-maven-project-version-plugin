@@ -131,6 +131,7 @@ public class LanguageUtils {
 
         public static String UPDATE_INFO_CHANGE_VERSION_TEXT = "update_info_change_version_text";
 
+        public static String UPDATE_INFO_NOT_CHANGE_VERSION_WITH_DEFAULT_TEXT = "update_info_not_change_version_with_default_text";
         public static String UPDATE_INFO_NOT_CHANGE_VERSION_WITH_EXTEND_PARENT_VERSION_TEXT = "update_info_not_change_version_with_extend_parent_version_text";
 
         public static String UPDATE_INFO_NOT_CHANGE_VERSION_WITH_FROM_OUTSIDE_TEXT = "update_info_not_change_version_with_from_outside_text";
