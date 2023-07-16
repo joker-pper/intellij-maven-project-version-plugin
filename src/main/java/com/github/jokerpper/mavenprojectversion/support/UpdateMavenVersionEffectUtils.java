@@ -2,14 +2,14 @@ package com.github.jokerpper.mavenprojectversion.support;
 
 import com.github.jokerpper.mavenprojectversion.model.UpdateMavenVersionEffectModel;
 import com.github.jokerpper.mavenprojectversion.util.StringUtils;
+import com.github.jokerpper.mavenprojectversion.util.VersionUtils;
 import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
 import org.jetbrains.idea.maven.dom.model.MavenDomParent;
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
 import org.jetbrains.idea.maven.model.MavenId;
 import org.jetbrains.idea.maven.project.MavenProject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class UpdateMavenVersionEffectUtils {
 
@@ -101,6 +101,17 @@ public class UpdateMavenVersionEffectUtils {
                 }
             }
 
+            Map<String, String[]> excerptAndToChangeVersionPropertiesMap = updateMavenVersionEffectModel.getExcerptAndToChangeVersionPropertiesMap();
+            if (excerptAndToChangeVersionPropertiesMap != null && !excerptAndToChangeVersionPropertiesMap.isEmpty()) {
+                sb.append("\r\n");
+                sb.append("[properties]: \r\n");
+                excerptAndToChangeVersionPropertiesMap.forEach((excerptAndToChangeVersionProperty, oldVersions) -> {
+                    //修改版本及显示具体的版本变更值
+                    sb.append(String.format("%s\r\n", excerptAndToChangeVersionProperty));
+                    sb.append(String.format("%s: %s -> %s\r\n", LanguageUtils.get(LanguageUtils.Constants.UPDATE_INFO_CHANGE_VERSION_TEXT, language), oldVersions.length == 1 ? oldVersions[0] : Arrays.toString(oldVersions), newVersion));
+                });
+            }
+
             List<UpdateMavenVersionEffectModel.Detail> dependencyDetailList = updateMavenVersionEffectModel.getDependencyDetailList();
             if (dependencyDetailList != null && !dependencyDetailList.isEmpty()) {
                 sb.append("\r\n");
@@ -173,5 +184,14 @@ public class UpdateMavenVersionEffectUtils {
         detail.setArtifactId(mavenDomDependency.getArtifactId().getRawText());
         detail.setVersion(mavenDomDependency.getVersion().getRawText());
         detailList.add(detail);
+    }
+
+    public static void initExcerptAndShouldChangeVersionProperty(UpdateMavenVersionEffectModel updateMavenVersionEffectModel, String excerptVersionRawText) {
+        Set<String> excerptAndToChangeVersionProperties = updateMavenVersionEffectModel.getExcerptAndShouldChangeVersionProperties();
+        if (excerptAndToChangeVersionProperties == null) {
+            excerptAndToChangeVersionProperties = new LinkedHashSet<>(32);
+            updateMavenVersionEffectModel.setExcerptAndShouldChangeVersionProperties(excerptAndToChangeVersionProperties);
+        }
+        excerptAndToChangeVersionProperties.add(VersionUtils.getExcerptVariableProperty(excerptVersionRawText));
     }
 }

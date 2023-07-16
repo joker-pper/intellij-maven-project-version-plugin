@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class UpdateMavenVersionEffectModel {
 
@@ -27,6 +29,18 @@ public class UpdateMavenVersionEffectModel {
 
     @Nullable
     private List<Detail> dependencyManagementDependencyDetailList;
+
+    /**
+     * 存在被引用且会进行修改版本的属性Map (key: 变量名, value: 版本值列表)
+     */
+    @Nullable
+    private Map<String, String[]> excerptAndToChangeVersionPropertiesMap;
+
+    /**
+     * 依赖中直接引用修改版本的属性列表
+     */
+    @Nullable
+    private Set<String> excerptAndShouldChangeVersionProperties;
 
     public String getPomPath() {
         return pomPath;
@@ -82,6 +96,22 @@ public class UpdateMavenVersionEffectModel {
 
     public void setDependencyManagementDependencyDetailList(List<Detail> dependencyManagementDependencyDetailList) {
         this.dependencyManagementDependencyDetailList = dependencyManagementDependencyDetailList;
+    }
+
+    public Map<String, String[]> getExcerptAndToChangeVersionPropertiesMap() {
+        return excerptAndToChangeVersionPropertiesMap;
+    }
+
+    public void setExcerptAndToChangeVersionPropertiesMap(@Nullable Map<String, String[]> excerptAndToChangeVersionPropertiesMap) {
+        this.excerptAndToChangeVersionPropertiesMap = excerptAndToChangeVersionPropertiesMap;
+    }
+
+    public Set<String> getExcerptAndShouldChangeVersionProperties() {
+        return excerptAndShouldChangeVersionProperties;
+    }
+
+    public void setExcerptAndShouldChangeVersionProperties(Set<String> excerptAndShouldChangeVersionProperties) {
+        this.excerptAndShouldChangeVersionProperties = excerptAndShouldChangeVersionProperties;
     }
 
     public static class Detail {

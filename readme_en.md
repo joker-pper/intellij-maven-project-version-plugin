@@ -118,7 +118,9 @@
 
  - intellij-maven-project-version-plugin-1.0.0.jar -> [src/test/resources/libs/intellij-maven-project-version-plugin-1.0.0.jar](src/test/resources/libs/intellij-maven-project-version-plugin-1.0.0.jar)
  
-
+## suggest
+ 
+    Best to use ${project. version} to maintain consistency in the version values of sub module dependencies in multiple modules.
 
 ## other
 

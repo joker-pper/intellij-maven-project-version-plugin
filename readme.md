@@ -114,6 +114,9 @@
  - intellij-maven-project-version-plugin-1.0.0.jar -> [src/test/resources/libs/intellij-maven-project-version-plugin-1.0.0.jar](src/test/resources/libs/intellij-maven-project-version-plugin-1.0.0.jar)
  
 
+## 建议
+
+  多模块中使用子模块依赖的version值推荐使用${project.version}来保持一致
 
 ## 其他
 

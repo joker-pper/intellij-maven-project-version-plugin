@@ -7,10 +7,8 @@ import com.github.jokerpper.mavenprojectversion.strategy.impl.UpdateMavenProject
 import com.github.jokerpper.mavenprojectversion.support.LanguageUtils;
 import com.github.jokerpper.mavenprojectversion.support.MessagesUtils;
 import com.github.jokerpper.mavenprojectversion.support.UpdateMavenVersionEffectUtils;
-import com.github.jokerpper.mavenprojectversion.util.DateFormatUtils;
-import com.github.jokerpper.mavenprojectversion.util.IntellijUtils;
-import com.github.jokerpper.mavenprojectversion.util.MatchUtils;
-import com.github.jokerpper.mavenprojectversion.util.StringUtils;
+import com.github.jokerpper.mavenprojectversion.support.UserConfUtils;
+import com.github.jokerpper.mavenprojectversion.util.*;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
@@ -19,22 +17,27 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
+import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.DomManager;
 import com.intellij.util.xml.GenericDomValue;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.idea.maven.dom.model.MavenDomDependencies;
-import org.jetbrains.idea.maven.dom.model.MavenDomDependency;
-import org.jetbrains.idea.maven.dom.model.MavenDomParent;
-import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel;
+import org.jetbrains.idea.maven.dom.model.*;
 import org.jetbrains.idea.maven.model.MavenId;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import javax.swing.*;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class UpdateMavenProjectVersionDialog extends DialogWrapper {
+
+    /**
+     * 是否修改properties中的version值
+     */
+    private static final String IS_CHANGE_VERSION_PROPERTIES_KEY = "update_version.is_change_version_properties";
 
     private final Project project;
     private final MavenProjectsManager projectsManager;
@@ -57,6 +60,9 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
 
     private Date updateStartTime;
     private Date updateEndTime;
+
+    private boolean isChangeVersionProperties;
+
 
     public UpdateMavenProjectVersionDialog(@Nullable Project project, boolean canBeParent) {
         super(project, canBeParent);
@@ -96,6 +102,7 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
         this.updateMavenVersionEffectModelList = new ArrayList<>(64);
         this.updateStartTime = new Date();
         this.updateEndTime = null;
+        this.isChangeVersionProperties = UserConfUtils.getProperty(Boolean.class, IS_CHANGE_VERSION_PROPERTIES_KEY, true);
     }
 
     @Override
@@ -174,6 +181,9 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
                 toResolveMavenProjects.addAll(toResolveChildMavenProjects);
             }
 
+
+            Map<MavenProject, MavenDomProjectModel> mavenProjectMavenDomProjectModelMap = new HashMap<>(64);
+
             for (MavenProject toResolveMavenProject : toResolveMavenProjects) {
                 VirtualFile virtualFile = toResolveMavenProject.getFile();
                 PsiFile psiFile = psiManager.findFile(virtualFile);
@@ -191,6 +201,10 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
                 MavenDomProjectModel rootElement = domFileElement.getRootElement();
                 MavenId toResolveMavenProjectMavenId = toResolveMavenProject.getMavenId();
 
+                if (isChangeVersionProperties) {
+                    mavenProjectMavenDomProjectModelMap.put(toResolveMavenProject, rootElement);
+                }
+
                 //resolve current project version
                 updateProjectVersion(rootProjectGroupId, rootProjectAllArtifactIdList, toResolveMavenProjectMavenId, rootElement, updateMavenProjectOptions);
 
@@ -203,6 +217,10 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
                 //resolve current project dependencyManagement dependencies
                 updateProjectDependencyManagementDependencyVersion(rootProjectGroupId, rootProjectAllArtifactIdList, rootElement, updateMavenProjectOptions);
             }
+
+            //resolve all project properties
+            updateChangeVersionProperties(toResolveMavenProjects, mavenProjectMavenDomProjectModelMap);
+
         } catch (Throwable throwable) {
             hasThrowable = true;
             updateVersionThrowable = throwable;
@@ -236,6 +254,64 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
             }
             toMatchProjectAllModulePaths(projectModulePaths, rootProjectAllModulePaths);
         }
+    }
+
+    /**
+     * 根据当前模块依赖中直接引用修改版本的属性列表记录当前模块以及父模块要修改properties的配置
+     *
+     * @param updateMavenVersionEffectModel
+     * @param options
+     */
+    private void doResolveUpdateChangeVersionPropertiesConfig(UpdateMavenVersionEffectModel updateMavenVersionEffectModel, ExcerptAndShouldChangeVersionPropertiesOptions options) {
+        doResolveUpdateChangeVersionPropertiesConfig(updateMavenVersionEffectModel, true, null, options);
+    }
+
+    private void doResolveUpdateChangeVersionPropertiesConfig(UpdateMavenVersionEffectModel updateMavenVersionEffectModel, boolean isFirst, Collection<String> excerptAndShouldChangeVersionProperties, ExcerptAndShouldChangeVersionPropertiesOptions options) {
+        if (isFirst) {
+            //依赖中直接引用修改版本的属性列表
+            excerptAndShouldChangeVersionProperties = updateMavenVersionEffectModel.getExcerptAndShouldChangeVersionProperties();
+            if (excerptAndShouldChangeVersionProperties == null || excerptAndShouldChangeVersionProperties.isEmpty()) {
+                return;
+            }
+        }
+
+        String currentKey = options.getUpdateMavenVersionEffectModelKeyFunction().apply(updateMavenVersionEffectModel);
+        MavenProject toResolveMavenProject = options.getMavenProjectMap().get(currentKey);
+        MavenDomProjectModel rootElement = options.getMavenProjectMavenDomProjectModelMap().get(toResolveMavenProject);
+        MavenDomProperties mavenDomProperties = rootElement.getProperties();
+
+        //获取当前项目中对应的实际存在引用版本的变量属性Map
+        Map<String, String[]> currentProjectExistExcerptPropertiesMap = VersionUtils.getCurrentProjectExistExcerptPropertiesMap(excerptAndShouldChangeVersionProperties, mavenDomProperties);
+        if (!currentProjectExistExcerptPropertiesMap.isEmpty()) {
+            //记录当前项目要修改的properties
+            Map<String, String[]> excerptAndToChangeVersionPropertiesMap = updateMavenVersionEffectModel.getExcerptAndToChangeVersionPropertiesMap();
+            if (excerptAndToChangeVersionPropertiesMap == null) {
+                excerptAndToChangeVersionPropertiesMap = new LinkedHashMap<>(32);
+                updateMavenVersionEffectModel.setExcerptAndToChangeVersionPropertiesMap(excerptAndToChangeVersionPropertiesMap);
+            }
+
+            excerptAndToChangeVersionPropertiesMap.putAll(currentProjectExistExcerptPropertiesMap);
+        }
+
+        //获取剩余待处理的引用版本的变量属性
+        List<String> remainExcerptProperties = new ArrayList<>(excerptAndShouldChangeVersionProperties);
+        remainExcerptProperties.removeAll(currentProjectExistExcerptPropertiesMap.keySet());
+        if (remainExcerptProperties.isEmpty()) {
+            //已不存在剩余待处理的
+            return;
+        }
+
+        //递归处理 -- 找到父级项目要修改的properties并写入
+        if (updateMavenVersionEffectModel.getProjectParentDetail() == null) {
+            return;
+        }
+
+        String effectParentModelKey = options.getUpdateMavenVersionEffectModelParentKeyFunction().apply(updateMavenVersionEffectModel);
+        UpdateMavenVersionEffectModel updateMavenVersionEffectParentModel = options.getMavenVersionEffectModelMap().get(effectParentModelKey);
+        if (updateMavenVersionEffectParentModel == null) {
+            return;
+        }
+        doResolveUpdateChangeVersionPropertiesConfig(updateMavenVersionEffectParentModel, false, remainExcerptProperties, options);
     }
 
     /**
@@ -316,10 +392,23 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
             if (MatchUtils.isMatchMavenDomDependency(rootProjectGroupId, rootProjectAllArtifactIdList, domDependency)) {
                 //match dependency
                 GenericDomValue<String> domDependencyVersion = domDependency.getVersion();
-                if (domDependencyVersion.exists() && updateMavenProjectVersionStrategyEnum.isUpdateProjectDependencyVersion(project, updateMavenProjectVersionForm, domDependencyVersion.getRawText())) {
+                if (!domDependencyVersion.exists()) {
+                    continue;
+                }
+
+                String versionRawText = domDependencyVersion.getRawText();
+                if (updateMavenProjectVersionStrategyEnum.isUpdateProjectDependencyVersion(project, updateMavenProjectVersionForm, versionRawText)) {
                     UpdateMavenVersionEffectUtils.initDependencyDetail(updateMavenProjectOptions.getEffectModel(), domDependency);
                     domDependencyVersion.setValue(newVersion);
                     this.updateVersionEffectSize++;
+                } else {
+                    if (!isChangeVersionProperties) {
+                        continue;
+                    }
+
+                    if (VersionUtils.isExcerptVersion(versionRawText) && !VersionUtils.isExcerptProjectVersion(versionRawText)) {
+                        UpdateMavenVersionEffectUtils.initExcerptAndShouldChangeVersionProperty(updateMavenProjectOptions.getEffectModel(), versionRawText);
+                    }
                 }
             }
         }
@@ -343,13 +432,141 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
             if (MatchUtils.isMatchMavenDomDependency(rootProjectGroupId, rootProjectAllArtifactIdList, domDependency)) {
                 //match dependency
                 GenericDomValue<String> domDependencyVersion = domDependency.getVersion();
-                if (domDependencyVersion.exists() && updateMavenProjectVersionStrategyEnum.isUpdateProjectDependencyManagementDependencyVersion(project, updateMavenProjectVersionForm, domDependencyVersion.getRawText())) {
+                if (!domDependencyVersion.exists()) {
+                    continue;
+                }
+                String versionRawText = domDependencyVersion.getRawText();
+                if (updateMavenProjectVersionStrategyEnum.isUpdateProjectDependencyManagementDependencyVersion(project, updateMavenProjectVersionForm, domDependencyVersion.getRawText())) {
                     UpdateMavenVersionEffectUtils.initDependencyManagementDependencyDetail(updateMavenProjectOptions.getEffectModel(), domDependency);
                     domDependencyVersion.setValue(newVersion);
                     this.updateVersionEffectSize++;
+                } else {
+                    if (!isChangeVersionProperties) {
+                        continue;
+                    }
+
+                    if (VersionUtils.isExcerptVersion(versionRawText) && !VersionUtils.isExcerptProjectVersion(versionRawText)) {
+                        UpdateMavenVersionEffectUtils.initExcerptAndShouldChangeVersionProperty(updateMavenProjectOptions.getEffectModel(), versionRawText);
+                    }
                 }
             }
         }
     }
 
+    /**
+     * 修改被引用的properties版本
+     *
+     * @param toResolveMavenProjects
+     * @param mavenProjectMavenDomProjectModelMap
+     */
+    private void updateChangeVersionProperties(List<MavenProject> toResolveMavenProjects, Map<MavenProject, MavenDomProjectModel> mavenProjectMavenDomProjectModelMap) {
+        if (!isChangeVersionProperties) {
+            //未启用时
+            return;
+        }
+
+        Function<UpdateMavenVersionEffectModel, String> updateMavenVersionEffectModelKeyFunction = (it) -> it.getProjectDetail().getGroupId() + "-" + it.getProjectDetail().getArtifactId();
+        Function<UpdateMavenVersionEffectModel, String> updateMavenVersionEffectModelParentKeyFunction = (it) -> it.getProjectParentDetail().getGroupId() + "-" + it.getProjectParentDetail().getArtifactId();
+        Map<String, UpdateMavenVersionEffectModel> mavenVersionEffectModelMap = updateMavenVersionEffectModelList.stream().collect(Collectors.toMap(updateMavenVersionEffectModelKeyFunction, Function.identity()));
+        Map<String, MavenProject> mavenProjectMap = toResolveMavenProjects.stream().collect(Collectors.toMap(it -> it.getMavenId().getGroupId() + "-" + it.getMavenId().getArtifactId(), Function.identity()));
+
+        ExcerptAndShouldChangeVersionPropertiesOptions options = new ExcerptAndShouldChangeVersionPropertiesOptions();
+
+        options.setUpdateMavenVersionEffectModelKeyFunction(updateMavenVersionEffectModelKeyFunction);
+        options.setUpdateMavenVersionEffectModelParentKeyFunction(updateMavenVersionEffectModelParentKeyFunction);
+        options.setMavenVersionEffectModelMap(mavenVersionEffectModelMap);
+        options.setMavenProjectMap(mavenProjectMap);
+        options.setMavenProjectMavenDomProjectModelMap(mavenProjectMavenDomProjectModelMap);
+
+        //进行处理相关模块的存在被引用且会进行修改版本的properties配置数据
+        updateMavenVersionEffectModelList.forEach(updateMavenVersionEffectModel -> {
+            doResolveUpdateChangeVersionPropertiesConfig(updateMavenVersionEffectModel, options);
+        });
+
+        //进行修改相关模块的properties数据
+        updateMavenVersionEffectModelList.forEach(updateMavenVersionEffectModel -> {
+            Map<String, String[]> excerptAndToChangeVersionPropertiesMap = updateMavenVersionEffectModel.getExcerptAndToChangeVersionPropertiesMap();
+            if (excerptAndToChangeVersionPropertiesMap == null || excerptAndToChangeVersionPropertiesMap.isEmpty()) {
+                return;
+            }
+            String currentKey = updateMavenVersionEffectModelKeyFunction.apply(updateMavenVersionEffectModel);
+            MavenProject toResolveMavenProject = mavenProjectMap.get(currentKey);
+            MavenDomProjectModel rootElement = mavenProjectMavenDomProjectModelMap.get(toResolveMavenProject);
+            MavenDomProperties mavenDomProperties = rootElement.getProperties();
+            doUpdateVersionProperties(excerptAndToChangeVersionPropertiesMap, mavenDomProperties, newVersion);
+        });
+    }
+
+
+    /**
+     * 修改pom中properties版本值
+     *
+     * @param excerptAndToChangeVersionPropertiesMap
+     * @param mavenDomProperties
+     * @param newVersion
+     */
+    public void doUpdateVersionProperties(Map<String, String[]> excerptAndToChangeVersionPropertiesMap,
+                                          MavenDomProperties mavenDomProperties,
+                                          String newVersion) {
+        if (excerptAndToChangeVersionPropertiesMap == null || excerptAndToChangeVersionPropertiesMap.isEmpty()) {
+            return;
+        }
+        XmlTag[] xmlTags = mavenDomProperties.getXmlTag().getSubTags();
+        for (XmlTag xmlTag : xmlTags) {
+            String xmlTagName = xmlTag.getName();
+            if (!excerptAndToChangeVersionPropertiesMap.containsKey(xmlTagName)) {
+                continue;
+            }
+            xmlTag.getValue().setText(newVersion);
+            updateVersionEffectSize++;
+        }
+    }
+
+    static class ExcerptAndShouldChangeVersionPropertiesOptions {
+        private Function<UpdateMavenVersionEffectModel, String> updateMavenVersionEffectModelKeyFunction;
+        private Function<UpdateMavenVersionEffectModel, String> updateMavenVersionEffectModelParentKeyFunction;
+        private Map<String, UpdateMavenVersionEffectModel> mavenVersionEffectModelMap;
+        private Map<String, MavenProject> mavenProjectMap;
+        private Map<MavenProject, MavenDomProjectModel> mavenProjectMavenDomProjectModelMap;
+
+        public Function<UpdateMavenVersionEffectModel, String> getUpdateMavenVersionEffectModelKeyFunction() {
+            return updateMavenVersionEffectModelKeyFunction;
+        }
+
+        public void setUpdateMavenVersionEffectModelKeyFunction(Function<UpdateMavenVersionEffectModel, String> updateMavenVersionEffectModelKeyFunction) {
+            this.updateMavenVersionEffectModelKeyFunction = updateMavenVersionEffectModelKeyFunction;
+        }
+
+        public Function<UpdateMavenVersionEffectModel, String> getUpdateMavenVersionEffectModelParentKeyFunction() {
+            return updateMavenVersionEffectModelParentKeyFunction;
+        }
+
+        public void setUpdateMavenVersionEffectModelParentKeyFunction(Function<UpdateMavenVersionEffectModel, String> updateMavenVersionEffectModelParentKeyFunction) {
+            this.updateMavenVersionEffectModelParentKeyFunction = updateMavenVersionEffectModelParentKeyFunction;
+        }
+
+        public Map<String, UpdateMavenVersionEffectModel> getMavenVersionEffectModelMap() {
+            return mavenVersionEffectModelMap;
+        }
+
+        public void setMavenVersionEffectModelMap(Map<String, UpdateMavenVersionEffectModel> mavenVersionEffectModelMap) {
+            this.mavenVersionEffectModelMap = mavenVersionEffectModelMap;
+        }
+
+        public Map<String, MavenProject> getMavenProjectMap() {
+            return mavenProjectMap;
+        }
+
+        public void setMavenProjectMap(Map<String, MavenProject> mavenProjectMap) {
+            this.mavenProjectMap = mavenProjectMap;
+        }
+
+        public Map<MavenProject, MavenDomProjectModel> getMavenProjectMavenDomProjectModelMap() {
+            return mavenProjectMavenDomProjectModelMap;
+        }
+
+        public void setMavenProjectMavenDomProjectModelMap(Map<MavenProject, MavenDomProjectModel> mavenProjectMavenDomProjectModelMap) {
+            this.mavenProjectMavenDomProjectModelMap = mavenProjectMavenDomProjectModelMap;
+        }
+    }
 }
