@@ -6,9 +6,6 @@ plugins {
 group 'com.github.joker-pper'
 version '1.0.2'
 
-//指定编译版本
-sourceCompatibility = 11
-targetCompatibility = 11
 
 repositories {
     maven {
@@ -51,5 +48,8 @@ v1.0.2
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
+    //指定编译版本
+    sourceCompatibility = 11
+    targetCompatibility = 11
     options.compilerArgs += ['-Xlint:unchecked', '-Xlint:deprecation', '-parameters']
 }
