@@ -106,7 +106,11 @@
   
      [src/test/resources/language-sample/mpvp/language](src/test/resources/language-sample/mpvp/language)
 
+## version
 
+    x.x.1    ->   idea 2017.3 - 2022.1
+    x.x.2    ->   idea 2022.2 - 2023.2
+    x.x.3    ->   idea 2023.3 - ?
 
 ## install
 
@@ -114,10 +118,7 @@
 
  - intellij-maven-project-version-plugin-1.0.1.jar -> [src/test/resources/libs/intellij-maven-project-version-plugin-1.0.1.jar](src/test/resources/libs/intellij-maven-project-version-plugin-1.0.1.jar)
  
- - intellij-maven-project-version-plugin-1.0.0.zip -> [src/test/resources/distributions/intellij-maven-project-version-plugin-1.0.0.zip](src/test/resources/distributions/intellij-maven-project-version-plugin-1.0.0.zip)
 
- - intellij-maven-project-version-plugin-1.0.0.jar -> [src/test/resources/libs/intellij-maven-project-version-plugin-1.0.0.jar](src/test/resources/libs/intellij-maven-project-version-plugin-1.0.0.jar)
- 
 ## suggest
  
     Best to use ${project. version} to maintain consistency in the version values of sub module dependencies in multiple modules.
