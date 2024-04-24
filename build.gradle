@@ -1,15 +1,14 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '1.1'
-    //id 'org.jetbrains.intellij' version '0.7.2'
+    id 'org.jetbrains.intellij' version '1.17.3'
 }
 
 group 'com.github.joker-pper'
-version '1.0.1'
+version '1.0.2'
 
 //指定编译版本
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
     maven {
@@ -30,17 +29,14 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.13.2'
+    testRuntimeOnly group: 'junit', name: 'junit', version: '4.13.2'
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = '2020.2'
+    //version = '2022.2'
+    version = '2023.2.6'
     plugins = ['maven', 'java']
-
-    //version = '2017.3'
-    //version = '2018.3'
-    //plugins = ['maven']
 
     updateSinceUntilBuild = false
 }
@@ -48,7 +44,7 @@ intellij {
 patchPluginXml {
 
     changeNotes = """<pre>
-v1.0.1
+v1.0.2
 </pre>"""
 
 }
