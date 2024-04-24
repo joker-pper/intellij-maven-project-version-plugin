@@ -118,9 +118,9 @@
 
  - intellij-maven-project-version-plugin-1.0.1.jar -> [src/test/resources/libs/intellij-maven-project-version-plugin-1.0.1.jar](src/test/resources/libs/intellij-maven-project-version-plugin-1.0.1.jar)
 
-- intellij-maven-project-version-plugin-1.0.2.zip -> [src/test/resources/distributions/intellij-maven-project-version-plugin-1.0.1.zip](src/test/resources/distributions/intellij-maven-project-version-plugin-1.0.2.zip)
+- intellij-maven-project-version-plugin-1.0.2.zip -> [src/test/resources/distributions/intellij-maven-project-version-plugin-1.0.2.zip](src/test/resources/distributions/intellij-maven-project-version-plugin-1.0.2.zip)
 
-- intellij-maven-project-version-plugin-1.0.2.jar -> [src/test/resources/libs/intellij-maven-project-version-plugin-1.0.1.jar](src/test/resources/libs/intellij-maven-project-version-plugin-1.0.2.jar)
+- intellij-maven-project-version-plugin-1.0.2.jar -> [src/test/resources/libs/intellij-maven-project-version-plugin-1.0.2.jar](src/test/resources/libs/intellij-maven-project-version-plugin-1.0.2.jar)
 
 
 
