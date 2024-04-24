@@ -24,6 +24,7 @@ public class UserConfUtils {
         return USER_CONF_CACHE.getProperty(key, defaultValue);
     }
 
+    @SuppressWarnings({"unchecked"})
     public static <T> T getProperty(Class<T> tClass, String key, T defaultValue) {
         if (tClass == null) {
             throw new IllegalArgumentException("tClass must be not null");

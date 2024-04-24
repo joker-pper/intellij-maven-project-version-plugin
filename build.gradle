@@ -9,6 +9,7 @@ version '1.0.1'
 
 //指定编译版本
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     maven {
@@ -54,4 +55,5 @@ v1.0.1
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
+    options.compilerArgs += ['-Xlint:unchecked', '-Xlint:deprecation', '-parameters']
 }
