@@ -106,7 +106,7 @@
 
     x.x.1    ->   idea 2017.3 - 2022.1
     x.x.2    ->   idea 2022.2 - 2023.2
-    x.x.3    ->   idea 2023.3 - ?
+    x.x.3    ->   idea 2023.3 - 2024.1
 
 ## 安装
 
@@ -118,6 +118,9 @@
 
  - intellij-maven-project-version-plugin-1.0.2.jar -> [src/test/resources/libs/intellij-maven-project-version-plugin-1.0.2.jar](src/test/resources/libs/intellij-maven-project-version-plugin-1.0.2.jar)
 
+ - intellij-maven-project-version-plugin-1.0.3.zip -> [src/test/resources/distributions/intellij-maven-project-version-plugin-1.0.3.zip](src/test/resources/distributions/intellij-maven-project-version-plugin-1.0.3.zip)
+
+ - intellij-maven-project-version-plugin-1.0.3.jar -> [src/test/resources/libs/intellij-maven-project-version-plugin-1.0.3.jar](src/test/resources/libs/intellij-maven-project-version-plugin-1.0.3.jar)
 
 
 ## 建议
