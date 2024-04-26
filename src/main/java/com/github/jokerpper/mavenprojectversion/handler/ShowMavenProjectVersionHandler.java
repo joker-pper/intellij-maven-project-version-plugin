@@ -21,6 +21,12 @@ public class ShowMavenProjectVersionHandler {
     private ShowMavenProjectVersionHandler() {
     }
 
+    /**
+     * 处理项目视图展示
+     *
+     * @param node
+     * @param data
+     */
     public void resolveMavenProjectView(ProjectViewNode node, PresentationData data) {
         Project project = node.getProject();
         MavenProjectsManager mavenProjectsManager = IntellijUtils.getMavenProjectsManager(project);
@@ -58,6 +64,12 @@ public class ShowMavenProjectVersionHandler {
         addColoredText(data, String.format("%s " + versionRule, "\t", version));
     }
 
+    /**
+     * 处理Maven项目结构视图展示
+     *
+     * @param project
+     * @param isShow
+     */
     public void resolveMavenStructureView(Project project, boolean isShow) {
         MavenProjectsNavigator mavenProjectsNavigator = MavenProjectsNavigator.getInstance(project);
         if (mavenProjectsNavigator == null) {
@@ -76,6 +88,11 @@ public class ShowMavenProjectVersionHandler {
 
     }
 
+    /**
+     * 刷新Maven项目视图
+     *
+     * @param project
+     */
     public void refreshMavenProjectView(Project project) {
         ProjectView projectView = ProjectView.getInstance(project);
         if (projectView == null) {
@@ -84,10 +101,21 @@ public class ShowMavenProjectVersionHandler {
         projectView.refresh();
     }
 
+
+    /**
+     * 刷新Maven项目结构视图
+     *
+     * @param project
+     */
     public void refreshMavenStructureView(Project project) {
         resolveMavenStructureView(project, ShowMavenProjectVersionState.getInstance(project).isShowStructureView());
     }
 
+    /**
+     * 同步Maven项目的结构视图的显示状态
+     *
+     * @param project
+     */
     public void syncIsShowStructureView(Project project) {
         MavenProjectsNavigator mavenProjectsNavigator = MavenProjectsNavigator.getInstance(project);
         if (mavenProjectsNavigator != null) {
@@ -96,6 +124,12 @@ public class ShowMavenProjectVersionHandler {
         }
     }
 
+    /**
+     * 是否为允许的项目视图版本规则
+     *
+     * @param viewVersionRule
+     * @return
+     */
     public boolean isAllowViewVersionRule(String viewVersionRule) {
         if (StringUtils.isEmpty(viewVersionRule) || !viewVersionRule.contains(SystemConstants.DEFAULT_VERSION_RULE)) {
             return false;
