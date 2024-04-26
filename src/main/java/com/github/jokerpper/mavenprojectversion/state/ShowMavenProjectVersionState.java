@@ -1,17 +1,20 @@
 package com.github.jokerpper.mavenprojectversion.state;
 
 import com.github.jokerpper.mavenprojectversion.constants.SystemConstants;
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.Service;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+@Service(Service.Level.PROJECT)
 @State(name = "ShowMavenProjectVersion", storages = {
         @Storage("workspace.xml")
-       // @Storage("show-maven-project-version.xml")
+        // @Storage("show-maven-project-version.xml")
 })
-public class ShowMavenProjectVersionState implements PersistentStateComponent<ShowMavenProjectVersionState> {
+public final class ShowMavenProjectVersionState implements PersistentStateComponent<ShowMavenProjectVersionState> {
 
     private boolean showProjectView = false;
 
@@ -44,7 +47,7 @@ public class ShowMavenProjectVersionState implements PersistentStateComponent<Sh
     }
 
     @Override
-    public @Nullable ShowMavenProjectVersionState getState() {
+    public ShowMavenProjectVersionState getState() {
         return this;
     }
 
@@ -55,6 +58,6 @@ public class ShowMavenProjectVersionState implements PersistentStateComponent<Sh
 
 
     public static ShowMavenProjectVersionState getInstance(Project project) {
-        return project.getComponent(ShowMavenProjectVersionState.class);
+        return project.getService(ShowMavenProjectVersionState.class);
     }
 }

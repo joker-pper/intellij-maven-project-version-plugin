@@ -4,7 +4,8 @@
     <vendor>joker-pper</vendor>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="222" until-build="232.*"/>
+    <idea-version since-build="233" until-build="241.*"/>
+
 
     <description><![CDATA[
     Maven Project Version Plugin And Plugin Menu Added In Tools Menu.
@@ -37,19 +38,13 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <postStartupActivity
+       <postStartupActivity
                 implementation="com.github.jokerpper.mavenprojectversion.startup.MavenProjectVersionStartupActivity"/>
 
         <projectViewNodeDecorator
                 implementation="com.github.jokerpper.mavenprojectversion.decorator.MavenProjectVersionViewDecorator"/>
     </extensions>
 
-
-    <project-components>
-        <component>
-            <implementation-class>com.github.jokerpper.mavenprojectversion.state.ShowMavenProjectVersionState</implementation-class>
-        </component>
-    </project-components>
 
     <actions>
         <!-- Add your actions here -->

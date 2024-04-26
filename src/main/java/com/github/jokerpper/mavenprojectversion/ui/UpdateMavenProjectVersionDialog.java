@@ -228,7 +228,7 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
             if (!hasThrowable) {
                 FileDocumentManager.getInstance().saveAllDocuments();
             }
-            projectsManager.forceUpdateProjects(projects);
+            projectsManager.scheduleForceUpdateMavenProjects(projects);
             updateEndTime = new Date();
             this.close(DialogWrapper.OK_EXIT_CODE);
         }
