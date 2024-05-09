@@ -1,11 +1,10 @@
 package com.github.jokerpper.mavenprojectversion.support;
 
 import com.github.jokerpper.mavenprojectversion.util.IntellijUtils;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -14,30 +13,42 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager;
 public class MavenProjectVersionActionGroup extends DefaultActionGroup implements DumbAware {
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        Presentation p = e.getPresentation();
-        p.setEnabled(isAvailable(e));
-        p.setVisible(isVisible(e));
+    public void update(@NotNull AnActionEvent event) {
+        Presentation p = event.getPresentation();
+
+        //设置是否显示ActionGroup
+        p.setVisible(isVisible(event));
+
+        //设置是否可用ActionGroup
+        p.setEnabled(isAvailable(event));
     }
 
-    protected boolean isAvailable(@NotNull AnActionEvent e) {
-        Project project = e.getData(PlatformDataKeys.PROJECT);
+
+    /**
+     * 是否支持该动作
+     *
+     * @param event
+     * @return
+     */
+    protected boolean isAvailable(@NotNull AnActionEvent event) {
+        Project project = IntellijUtils.getProject(event);
         MavenProjectsManager mavenProjectsManager = IntellijUtils.getMavenProjectsManager(project);
-        if (mavenProjectsManager == null || mavenProjectsManager.getProjects().isEmpty()) {
-            return false;
-        }
-        return true;
+        return mavenProjectsManager != null && !mavenProjectsManager.getProjects().isEmpty();
     }
 
-    protected boolean isVisible(@NotNull AnActionEvent e) {
-        if (!IntellijUtils.isMavenizedProject(e)) {
-            return false;
-        }
-        return true;
+    /**
+     * 是否显示ActionGroup
+     *
+     * @param event
+     * @return
+     */
+    protected boolean isVisible(@NotNull AnActionEvent event) {
+        return IntellijUtils.isMavenizedProject(event);
     }
 
     @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
+    @NotNull
+    public ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;
     }
 

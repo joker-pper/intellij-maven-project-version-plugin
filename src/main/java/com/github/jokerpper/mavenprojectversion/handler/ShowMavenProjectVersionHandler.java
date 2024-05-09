@@ -10,6 +10,8 @@ import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.SimpleTextAttributes;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.navigator.MavenProjectsNavigator;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
@@ -27,7 +29,7 @@ public class ShowMavenProjectVersionHandler {
      * @param node
      * @param data
      */
-    public void resolveMavenProjectView(ProjectViewNode node, PresentationData data) {
+    public void resolveMavenProjectView(@NotNull ProjectViewNode<?> node, @NotNull PresentationData data) {
         Project project = node.getProject();
         MavenProjectsManager mavenProjectsManager = IntellijUtils.getMavenProjectsManager(project);
         if (!IntellijUtils.isMavenizedProject(mavenProjectsManager)) {
@@ -70,7 +72,7 @@ public class ShowMavenProjectVersionHandler {
      * @param project
      * @param isShow
      */
-    public void resolveMavenStructureView(Project project, boolean isShow) {
+    public void resolveMavenStructureView(@NotNull Project project, boolean isShow) {
         MavenProjectsNavigator mavenProjectsNavigator = MavenProjectsNavigator.getInstance(project);
         if (mavenProjectsNavigator == null) {
             return;
@@ -93,7 +95,7 @@ public class ShowMavenProjectVersionHandler {
      *
      * @param project
      */
-    public void refreshMavenProjectView(Project project) {
+    public void refreshMavenProjectView(@NotNull Project project) {
         ProjectView projectView = ProjectView.getInstance(project);
         if (projectView == null) {
             return;
@@ -107,7 +109,7 @@ public class ShowMavenProjectVersionHandler {
      *
      * @param project
      */
-    public void refreshMavenStructureView(Project project) {
+    public void refreshMavenStructureView(@NotNull Project project) {
         resolveMavenStructureView(project, ShowMavenProjectVersionState.getInstance(project).isShowStructureView());
     }
 
@@ -116,7 +118,7 @@ public class ShowMavenProjectVersionHandler {
      *
      * @param project
      */
-    public void syncIsShowStructureView(Project project) {
+    public void syncIsShowStructureView(@NotNull Project project) {
         MavenProjectsNavigator mavenProjectsNavigator = MavenProjectsNavigator.getInstance(project);
         if (mavenProjectsNavigator != null) {
             ShowMavenProjectVersionState showMavenProjectVersionState = ShowMavenProjectVersionState.getInstance(project);
@@ -130,18 +132,18 @@ public class ShowMavenProjectVersionHandler {
      * @param viewVersionRule
      * @return
      */
-    public boolean isAllowViewVersionRule(String viewVersionRule) {
+    public boolean isAllowViewVersionRule(@Nullable String viewVersionRule) {
         if (StringUtils.isEmpty(viewVersionRule) || !viewVersionRule.contains(SystemConstants.DEFAULT_VERSION_RULE)) {
             return false;
         }
         return true;
     }
 
-    private void addColoredText(PresentationData data, String text) {
+    private void addColoredText(@NotNull PresentationData data, String text) {
         addColoredText(data, text, SimpleTextAttributes.GRAYED_ATTRIBUTES);
     }
 
-    private void addColoredText(PresentationData data, String text, SimpleTextAttributes simpleTextAttributes) {
+    private void addColoredText(@NotNull PresentationData data, String text, SimpleTextAttributes simpleTextAttributes) {
         if (data.getColoredText().isEmpty()) {
             data.addText(data.getPresentableText(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
         }

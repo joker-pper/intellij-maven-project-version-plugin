@@ -21,6 +21,7 @@ import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.xml.DomFileElement;
 import com.intellij.util.xml.DomManager;
 import com.intellij.util.xml.GenericDomValue;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.dom.model.*;
 import org.jetbrains.idea.maven.model.MavenId;
@@ -64,7 +65,7 @@ public class UpdateMavenProjectVersionDialog extends DialogWrapper {
     private boolean isChangeVersionProperties;
 
 
-    public UpdateMavenProjectVersionDialog(@Nullable Project project, boolean canBeParent) {
+    public UpdateMavenProjectVersionDialog(@NotNull Project project, boolean canBeParent) {
         super(project, canBeParent);
 
         this.project = project;

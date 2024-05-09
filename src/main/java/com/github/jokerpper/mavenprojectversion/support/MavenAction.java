@@ -15,17 +15,17 @@ import org.jetbrains.idea.maven.utils.actions.MavenActionUtil;
  */
 public abstract class MavenAction extends AnAction implements DumbAware {
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        Presentation p = e.getPresentation();
-        p.setEnabled(isAvailable(e));
-        p.setVisible(isVisible(e));
+    public void update(@NotNull AnActionEvent event) {
+        Presentation p = event.getPresentation();
+        p.setEnabled(isAvailable(event));
+        p.setVisible(isVisible(event));
     }
 
-    protected boolean isAvailable(@NotNull AnActionEvent e) {
-        return MavenActionUtil.hasProject(e.getDataContext());
+    protected boolean isAvailable(@NotNull AnActionEvent event) {
+        return MavenActionUtil.hasProject(event.getDataContext());
     }
 
-    protected boolean isVisible(@NotNull AnActionEvent e) {
+    protected boolean isVisible(@NotNull AnActionEvent event) {
         return true;
     }
 

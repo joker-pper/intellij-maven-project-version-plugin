@@ -57,7 +57,7 @@ public final class ShowMavenProjectVersionState implements PersistentStateCompon
     }
 
 
-    public static ShowMavenProjectVersionState getInstance(Project project) {
+    public static ShowMavenProjectVersionState getInstance(@NotNull Project project) {
         return project.getService(ShowMavenProjectVersionState.class);
     }
 }
