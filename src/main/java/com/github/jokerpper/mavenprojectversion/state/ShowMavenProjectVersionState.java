@@ -54,7 +54,7 @@ public class ShowMavenProjectVersionState implements PersistentStateComponent<Sh
     }
 
 
-    public static ShowMavenProjectVersionState getInstance(Project project) {
+    public static ShowMavenProjectVersionState getInstance(@NotNull Project project) {
         return project.getComponent(ShowMavenProjectVersionState.class);
     }
 }

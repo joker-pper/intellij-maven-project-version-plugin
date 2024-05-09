@@ -3,6 +3,7 @@ package com.github.jokerpper.mavenprojectversion.support;
 import com.github.jokerpper.mavenprojectversion.constants.SystemConstants;
 import com.github.jokerpper.mavenprojectversion.util.PropertiesUtils;
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,7 +34,7 @@ public class UserPropertiesUtils {
      *
      * @param project
      */
-    public static void init(Project project) {
+    public static void init(@NotNull Project project) {
 
         GLOBAL_CONF_PROPERTIES = new Properties();
         GLOBAL_LAN_CACHE = new HashMap<>(32);

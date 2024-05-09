@@ -10,6 +10,8 @@ import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.SimpleTextAttributes;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.idea.maven.navigator.MavenProjectsNavigator;
 import org.jetbrains.idea.maven.project.MavenProject;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
@@ -21,7 +23,13 @@ public class ShowMavenProjectVersionHandler {
     private ShowMavenProjectVersionHandler() {
     }
 
-    public void resolveMavenProjectView(ProjectViewNode node, PresentationData data) {
+    /**
+     * 处理项目视图展示
+     *
+     * @param node
+     * @param data
+     */
+    public void resolveMavenProjectView(@NotNull ProjectViewNode<?> node, @NotNull PresentationData data) {
         Project project = node.getProject();
         MavenProjectsManager mavenProjectsManager = IntellijUtils.getMavenProjectsManager(project);
         if (!IntellijUtils.isMavenizedProject(mavenProjectsManager)) {
@@ -58,7 +66,13 @@ public class ShowMavenProjectVersionHandler {
         addColoredText(data, String.format("%s " + versionRule, "\t", version));
     }
 
-    public void resolveMavenStructureView(Project project, boolean isShow) {
+    /**
+     * 处理Maven项目结构视图展示
+     *
+     * @param project
+     * @param isShow
+     */
+    public void resolveMavenStructureView(@NotNull Project project, boolean isShow) {
         MavenProjectsNavigator mavenProjectsNavigator = MavenProjectsNavigator.getInstance(project);
         if (mavenProjectsNavigator == null) {
             return;
@@ -76,7 +90,12 @@ public class ShowMavenProjectVersionHandler {
 
     }
 
-    public void refreshMavenProjectView(Project project) {
+    /**
+     * 刷新Maven项目视图
+     *
+     * @param project
+     */
+    public void refreshMavenProjectView(@NotNull Project project) {
         ProjectView projectView = ProjectView.getInstance(project);
         if (projectView == null) {
             return;
@@ -84,11 +103,22 @@ public class ShowMavenProjectVersionHandler {
         projectView.refresh();
     }
 
-    public void refreshMavenStructureView(Project project) {
+
+    /**
+     * 刷新Maven项目结构视图
+     *
+     * @param project
+     */
+    public void refreshMavenStructureView(@NotNull Project project) {
         resolveMavenStructureView(project, ShowMavenProjectVersionState.getInstance(project).isShowStructureView());
     }
 
-    public void syncIsShowStructureView(Project project) {
+    /**
+     * 同步Maven项目的结构视图的显示状态
+     *
+     * @param project
+     */
+    public void syncIsShowStructureView(@NotNull Project project) {
         MavenProjectsNavigator mavenProjectsNavigator = MavenProjectsNavigator.getInstance(project);
         if (mavenProjectsNavigator != null) {
             ShowMavenProjectVersionState showMavenProjectVersionState = ShowMavenProjectVersionState.getInstance(project);
@@ -96,18 +126,24 @@ public class ShowMavenProjectVersionHandler {
         }
     }
 
-    public boolean isAllowViewVersionRule(String viewVersionRule) {
+    /**
+     * 是否为允许的项目视图版本规则
+     *
+     * @param viewVersionRule
+     * @return
+     */
+    public boolean isAllowViewVersionRule(@Nullable String viewVersionRule) {
         if (StringUtils.isEmpty(viewVersionRule) || !viewVersionRule.contains(SystemConstants.DEFAULT_VERSION_RULE)) {
             return false;
         }
         return true;
     }
 
-    private void addColoredText(PresentationData data, String text) {
+    private void addColoredText(@NotNull PresentationData data, String text) {
         addColoredText(data, text, SimpleTextAttributes.GRAYED_ATTRIBUTES);
     }
 
-    private void addColoredText(PresentationData data, String text, SimpleTextAttributes simpleTextAttributes) {
+    private void addColoredText(@NotNull PresentationData data, String text, SimpleTextAttributes simpleTextAttributes) {
         if (data.getColoredText().isEmpty()) {
             data.addText(data.getPresentableText(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
         }
