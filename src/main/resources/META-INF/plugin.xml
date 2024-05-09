@@ -8,10 +8,17 @@
 
 
     <description><![CDATA[
+
+    Maven项目版本插件，可用于版本快速傻瓜式升级及项目版本展示.
+    <br/>
+    Maven Project Version Plugin, Support Quick Update Version And Show Project Version.
+    <br/>
+    <hr style="border: 0; padding: 2px;"/>
+
     Maven Project Version Plugin And Plugin Menu Added In Tools Menu.
     <br/>
 
-    <h4>1.More Strategy To Update Version.</h4>
+    1.More Strategy To Update Version.
 
     <p style="margin-left: 10px; font-size:11px; margin-top: 2px">Default Strategy</p>
     <p style="margin-left: 15px; margin-top: 5px">- must have new version and changed version.</p>
@@ -25,8 +32,16 @@
     <p style="margin-left: 15px; margin-top: 5px">- if checked: project or dependency version not equals project before replacement version will continue replace.</p>
     <p style="margin-left: 15px; margin-top: 5px">- if not checked: new version will to replace.</p>
 
-    <h4>2.Active Show Version In Project View.</h4>
+    2.Active Show Version In Project View.
+    <br/>
+    <br/>
 
+    更多 More
+    <br/>
+    <a href="https://github.com/joker-pper/intellij-maven-project-version-plugin/blob/master/readme.md">中文文档</a> /
+    <a href="https://github.com/joker-pper/intellij-maven-project-version-plugin/blob/master/readme_en.md">English Document</a>
+    <br/>
+    <br/>
     ]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
