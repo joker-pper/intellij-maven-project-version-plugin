@@ -8,6 +8,7 @@ import com.github.jokerpper.mavenprojectversion.support.MessagesUtils;
 import com.github.jokerpper.mavenprojectversion.util.StringUtils;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -18,7 +19,7 @@ public class ShowMavenProjectVersionDialog extends DialogWrapper {
 
     private final ShowMavenProjectVersionForm showMavenProjectVersionForm;
 
-    public ShowMavenProjectVersionDialog(@Nullable Project project, boolean canBeParent) {
+    public ShowMavenProjectVersionDialog(@NotNull Project project, boolean canBeParent) {
         super(project, canBeParent);
 
         this.project = project;

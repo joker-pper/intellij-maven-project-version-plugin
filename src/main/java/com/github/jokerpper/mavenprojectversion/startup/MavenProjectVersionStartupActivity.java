@@ -12,6 +12,8 @@ public class MavenProjectVersionStartupActivity implements StartupActivity {
 
     @Override
     public void runActivity(@NotNull Project project) {
+        //在启动和关闭前同步Maven项目的结构视图的显示状态值
+
         ShowMavenProjectVersionHandler.INSTANCE.syncIsShowStructureView(project);
 
         MessageBusConnection connection = project.getMessageBus().connect();

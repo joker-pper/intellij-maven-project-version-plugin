@@ -10,7 +10,7 @@ import com.intellij.ui.ColoredTreeCellRenderer;
 public class MavenProjectVersionViewDecorator implements ProjectViewNodeDecorator {
 
     @Override
-    public void decorate(ProjectViewNode node, PresentationData data) {
+    public void decorate(ProjectViewNode<?> node, PresentationData data) {
         ShowMavenProjectVersionHandler.INSTANCE.resolveMavenProjectView(node, data);
     }
 
